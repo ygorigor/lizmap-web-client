@@ -34,3 +34,4 @@ lizmap/composer.lock
 
 tests/vendor/
 tests/composer.lock
+lizmap/sync.ffs_db
