@@ -252,7 +252,7 @@ class pgsqlDbTools extends jDbTools {
 
         // get field informations
         $sql_get_fields = "SELECT t.typname, a.attname, a.attnotnull, a.attnum, a.attlen, a.atttypmod,
-        a.atthasdef, pg_get_expr(d.adbin,d.adrelid)
+        a.atthasdef, pg_get_expr(d.adbin,d.adrelid) AS adsrc
         FROM pg_type t, pg_attribute a LEFT JOIN pg_attrdef d ON (d.adrelid=a.attrelid AND d.adnum=a.attnum)
         WHERE
           a.attnum > 0 AND a.attrelid = ".$table->oid." AND a.atttypid = t.oid
