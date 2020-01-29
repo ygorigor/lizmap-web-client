@@ -34,8 +34,11 @@ lizmap/vendor/
 lizmap/composer.lock
 .php_cs
 .php_cs.cache
-build
-
+build/
+.drafts
+docker/factory.manifest
+docker/.run
+docker/*.zip
 tests/vendor/
 tests/composer.lock
 lizmap/sync.ffs_db
