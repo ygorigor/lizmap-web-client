@@ -59,7 +59,7 @@ class lizmapServices
     );
 
     /**
-     * services properties to not display into the configuration form
+     * services properties to not display into the configuration form.
      */
     private $sensitiveProperties = array(
         'qgisServerVersion',
@@ -139,7 +139,8 @@ class lizmapServices
     /**
      * backend to use to do http request : use curl ('curl') or file_get_contents ('php').
      * leave empty to have automatic selection (it will use curl if the curl extension is installed).
-     * Fill it only for tests
+     * Fill it only for tests.
+     *
      * @var string
      */
     public $proxyHttpBackend = '';

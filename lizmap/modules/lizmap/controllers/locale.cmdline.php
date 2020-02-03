@@ -200,7 +200,7 @@ class localeCtrl extends jControllerCmdLine
         }
 
         $targetFile = $this->getOutputFile($module, 'pot');
-        $rep->addContent("save to: ${targetFile}\n");
+        $rep->addContent("save to: {$targetFile}\n");
         \Gettext\Generators\Po::toFile($translations, $targetFile);
 
         $rep->addContent("================\n");
@@ -281,7 +281,7 @@ class localeCtrl extends jControllerCmdLine
         }
 
         $targetFile = $this->getOutputFile($module, 'po');
-        $rep->addContent("save to: ${targetFile}\n");
+        $rep->addContent("save to: {$targetFile}\n");
         \Gettext\Generators\Po::toFile($translations, $targetFile);
 
         $rep->addContent("================\n");
@@ -353,7 +353,7 @@ class localeCtrl extends jControllerCmdLine
                         'lineLength' => 500,
                         'spaceAroundEqual' => false,
                         'removeTrailingSpace' => true,
-                        "cutOnlyAtSpace"=>true,
+                        'cutOnlyAtSpace' => true,
                         'headerComment' => "Please don't modify this file.\nTo contribute on translations, go to https://www.transifex.com/3liz-1/lizmap-locales/.",
                     )
                 );

@@ -128,6 +128,7 @@ class lizmapOGCRequest
         }
         $key = sha1($key);
         $cached = false;
+
         try {
             $cached = jCache::get($key, 'qgisprojects');
         } catch (Exception $e) {
@@ -136,7 +137,7 @@ class lizmapOGCRequest
             jLog::logEx($e, 'error');
         }
         // invalid cache
-        if ($cached !== false && $cached['mtime'] < $this->project->getFileTime() ) {
+        if ($cached !== false && $cached['mtime'] < $this->project->getFileTime()) {
             $cached = false;
         }
         // return cached data

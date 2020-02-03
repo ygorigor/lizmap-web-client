@@ -59,17 +59,18 @@ class datavizPlot
     /**
      * datavizPlot constructor.
      *
-     * @param string $repository
-     * @param string $project
-     * @param string $layerId
-     * @param string $x_field
-     * @param string $y_field
-     * @param array  $colors
-     * @param array  $colorfields
-     * @param string $title
-     * @param null   $layout
-     * @param null   $aggregation
-     * @param null   $data
+     * @param string     $repository
+     * @param string     $project
+     * @param string     $layerId
+     * @param string     $x_field
+     * @param string     $y_field
+     * @param array      $colors
+     * @param array      $colorfields
+     * @param string     $title
+     * @param null       $layout
+     * @param null       $aggregation
+     * @param null       $data
+     * @param null|mixed $z_field
      *
      * @throws jExceptionSelector
      */
@@ -201,9 +202,10 @@ class datavizPlot
         $layer = $this->lproj->getLayer($this->layerId);
         $aliases = $layer->getAliasFields();
         $name = $field;
-        if (array_key_exists($field, $aliases) and !empty($aliases[$field]) ) {
+        if (array_key_exists($field, $aliases) and !empty($aliases[$field])) {
             $name = $aliases[$field];
         }
+
         return $name;
     }
 
@@ -229,7 +231,7 @@ class datavizPlot
             ),
         );
 
-        if($this->type == 'pie' or $this->type == 'sunburst'){
+        if ($this->type == 'pie' or $this->type == 'sunburst') {
             $layout['legend']['orientation'] = 'h';
             $layout['legend']['y'] = '-5';
         }
@@ -340,10 +342,10 @@ class datavizPlot
                 'TYPENAME' => $typename,
                 'OUTPUTFORMAT' => 'GeoJSON',
                 'GEOMETRYNAME' => 'none',
-                'PROPERTYNAME' => implode(',', $propertyname)
+                'PROPERTYNAME' => implode(',', $propertyname),
             );
             // Sort by x fields when scatter plot is used
-            if($this->type == 'scatter'){
+            if ($this->type == 'scatter') {
                 $wfsparams['SORTBY'] = ','.implode(',', $this->x_fields);
             }
             if (!empty($this->colorfields)) {
@@ -440,7 +442,7 @@ class datavizPlot
                 $yf = $y_field;
                 // x
                 $xf = null;
-                if (count($this->x_fields)  == 1) {
+                if (count($this->x_fields) == 1) {
                     $xf = $this->x_field;
                 }
                 // z
@@ -492,14 +494,13 @@ class datavizPlot
                         // Fill in X field
                         if (count($this->x_fields) == 1) {
                             $trace[$this->x_property_name][] = $feat->properties->{$xf};
-
                         }
 
                         // Fill in Y field
                         $trace[$this->y_property_name][] = $feat->properties->{$yf};
 
                         // Fill in Z field
-                        if ($this->z_property_name and count($this->z_fields) == 1 ) {
+                        if ($this->z_property_name and count($this->z_fields) == 1) {
                             $trace[$this->z_property_name][] = $feat->properties->{$zf};
                         }
 
@@ -526,7 +527,7 @@ class datavizPlot
                                 $x_aggregate_stddev[$feat->properties->{$xf}] = 0;
                                 $x_aggregate_median[$feat->properties->{$xf}] = array();
 
-                                if( $this->z_property_name and !empty($zf)){
+                                if ($this->z_property_name and !empty($zf)) {
                                     $x_distinct_parent[$feat->properties->{$xf}] = $feat->properties->{$zf};
                                 }
 
@@ -588,7 +589,7 @@ class datavizPlot
                     foreach ($x_aggregate_sum as $key => $value) {
                         // x
                         $trace[$this->x_property_name][] = $key;
-                        if( $this->z_property_name ) {
+                        if ($this->z_property_name) {
                             $trace[$this->z_property_name][] = $x_distinct_parent[$key];
                         }
 
@@ -632,19 +633,18 @@ class datavizPlot
                     $colors_before = array('white');
                     $vtotal = 0;
 
-                    foreach ($parents_distinct_values as $z=>$v) {
+                    foreach ($parents_distinct_values as $z => $v) {
                         $labels_before[] = $z;
                         $values_before[] = $v;
                         $parents_before[] = 'Total';
                         $colors_before[] = $parents_distinct_colors[$z];
-                        $vtotal+= $v;
-                    };
+                        $vtotal += $v;
+                    }
                     $values_before[0] = $vtotal;
                     $trace[$this->x_property_name] = array_merge($labels_before, $trace[$this->x_property_name]);
                     $trace[$this->y_property_name] = array_merge($values_before, $trace[$this->y_property_name]);
                     $trace[$this->z_property_name] = array_merge($parents_before, $trace[$this->z_property_name]);
                     $featcolors = array_merge($colors_before, $featcolors);
-
                 }
 
                 // set color
@@ -697,7 +697,7 @@ class datavizPlotScatter extends datavizPlot
 
     protected $x_property_name = 'x';
     protected $y_property_name = 'y';
-    protected $z_property_name = null;
+    protected $z_property_name;
 
     protected function getTraceTemplate()
     {
@@ -735,7 +735,7 @@ class datavizPlotBox extends datavizPlot
 
     protected $x_property_name = 'x';
     protected $y_property_name = 'y';
-    protected $z_property_name = null;
+    protected $z_property_name;
 
     protected function getTraceTemplate()
     {
@@ -767,7 +767,7 @@ class datavizPlotBar extends datavizPlot
 
     protected $x_property_name = 'x';
     protected $y_property_name = 'y';
-    protected $z_property_name = null;
+    protected $z_property_name;
 
     protected function getTraceTemplate()
     {
@@ -819,7 +819,7 @@ class datavizPlotHistogram extends datavizPlot
 
     protected $x_property_name = 'x';
     protected $y_property_name = 'y';
-    protected $z_property_name = null;
+    protected $z_property_name;
 
     protected function getTraceTemplate()
     {
@@ -856,7 +856,7 @@ class datavizPlotPie extends datavizPlot
 
     protected $x_property_name = 'labels';
     protected $y_property_name = 'values';
-    protected $z_property_name = null;
+    protected $z_property_name;
 
     protected function getTraceTemplate()
     {
@@ -868,7 +868,7 @@ class datavizPlotPie extends datavizPlot
             'hoverinfo' => 'label+value+percent',
             'textinfo' => 'value',
             'opacity' => null,
-            'hole' => '0.4'
+            'hole' => '0.4',
         );
     }
 }
@@ -879,7 +879,7 @@ class datavizPlotHistogram2d extends datavizPlot
 
     protected $x_property_name = 'x';
     protected $y_property_name = 'y';
-    protected $z_property_name = null;
+    protected $z_property_name;
 
     protected function getTraceTemplate()
     {
@@ -900,7 +900,7 @@ class datavizPlotPolar extends datavizPlot
 
     protected $x_property_name = 'r';
     protected $y_property_name = 't';
-    protected $z_property_name = null;
+    protected $z_property_name;
 
     protected function getTraceTemplate()
     {
@@ -920,7 +920,6 @@ class datavizPlotPolar extends datavizPlot
     }
 }
 
-
 class datavizPlotSunburst extends datavizPlot
 {
     public $type = 'sunburst';
@@ -937,9 +936,9 @@ class datavizPlotSunburst extends datavizPlot
             'values' => array(),
             'labels' => array(),
             'parents' => array(),
-            'branchvalues'=> 'total',
+            'branchvalues' => 'total',
             //'hovertemplate' => "%{label} (%{value:.1f})",
-            'hoverinfo' => "label+value+percent",
+            'hoverinfo' => 'label+value+percent',
             //'textinfo' => 'value',
             'texttemplate' => '%{value:.0f}',
             'opacity' => null,

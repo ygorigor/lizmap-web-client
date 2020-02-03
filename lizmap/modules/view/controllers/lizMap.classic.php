@@ -17,7 +17,8 @@ class lizMapCtrl extends jController
     protected $projectKey;
 
     /**
-     * Used to pass project Object (no need to rebuild it)
+     * Used to pass project Object (no need to rebuild it).
+     *
      * @var lizmapProject
      */
     protected $projectObj;
@@ -156,7 +157,7 @@ class lizMapCtrl extends jController
         $rep->addJSLink($confDate['default']);
         if (isset($confDate['default.js'])) {
             $js = $confDate['default.js'];
-            foreach($js as $file) {
+            foreach ($js as $file) {
                 $file = str_replace('$lang', jLocale::getCurrentLang(), $file);
                 if (strpos($file, 'jquery.ui.datepicker-en.js') !== false) {
                     continue;
@@ -239,8 +240,8 @@ class lizMapCtrl extends jController
             $options = $lproj->getOptions();
             $atlasWidth = $options->atlasMaxWidth;
             $cssContent = '';
-            $cssContent .= "#content.atlas-visible:not(.mobile) #right-dock {width: ${atlasWidth}%; max-width: ${atlasWidth}%;}";
-            $cssContent .= "#content.atlas-visible:not(.mobile) #map-content {margin-right: ${atlasWidth}%;}";
+            $cssContent .= "#content.atlas-visible:not(.mobile) #right-dock {width: {$atlasWidth}%; max-width: {$atlasWidth}%;}";
+            $cssContent .= "#content.atlas-visible:not(.mobile) #map-content {margin-right: {$atlasWidth}%;}";
             $css = '<style type="text/css">'.$cssContent.'</style>';
             $rep->addHeadContent($css);
         }
@@ -427,7 +428,7 @@ class lizMapCtrl extends jController
 
         // legend = legend open at startup
         $l = $this->intParam('l', 1);
-        if ($l == 0  ||
+        if ($l == 0 ||
             (
                 property_exists($pOptions, 'hideLegend')
                 && $pOptions->hideLegend == 'True'

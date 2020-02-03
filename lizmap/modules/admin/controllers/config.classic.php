@@ -14,7 +14,7 @@ class configCtrl extends jController
     // Configure access via jacl2 rights management
     public $pluginParams = array(
         '*' => array('jacl2.right' => 'lizmap.admin.access'),
-        'index' => array('jacl2.rights.and'=> ['lizmap.admin.access', 'lizmap.admin.services.view']),
+        'index' => array('jacl2.rights.and' => array('lizmap.admin.access', 'lizmap.admin.services.view')),
         'modifyServices' => array('jacl2.right' => 'lizmap.admin.services.update'),
         'editServices' => array('jacl2.right' => 'lizmap.admin.services.update'),
         'saveServices' => array('jacl2.right' => 'lizmap.admin.services.update'),
@@ -222,9 +222,9 @@ class configCtrl extends jController
         if ($form->getData('cacheExpiration') < 0 or $form->getData('cacheExpiration') > 2592000) {
             $ok = false;
             $form->setErrorOn(
-          'cacheExpiration',
-          jLocale::get('admin~admin.form.admin_services.message.cacheExpiration.wrong')
-      );
+                'cacheExpiration',
+                jLocale::get('admin~admin.form.admin_services.message.cacheExpiration.wrong')
+            );
         }
         // Check the wmsPublicUrlList : must sub-domain
         $wmsPublicUrlList = $form->getData('wmsPublicUrlList');
@@ -239,9 +239,9 @@ class configCtrl extends jController
 
                 $ok = false;
                 $form->setErrorOn(
-              'wmsPublicUrlList',
-              jLocale::get('admin~admin.form.admin_services.message.wmsPublicUrlList.wrong')
-          );
+                    'wmsPublicUrlList',
+                    jLocale::get('admin~admin.form.admin_services.message.wmsPublicUrlList.wrong')
+                );
 
                 break;
             }
@@ -277,5 +277,4 @@ class configCtrl extends jController
 
         return $rep;
     }
-
 }

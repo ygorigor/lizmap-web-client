@@ -29,7 +29,7 @@ class qgisFormControl
     public $fieldName = '';
 
     // QGIS default value
-    public $defaultValue = null;
+    public $defaultValue;
 
     // Qgis field type
     public $fieldEditType = '';
@@ -172,15 +172,15 @@ class qgisFormControl
      * Create an jForms control object based on a qgis edit widget.
      * And add it to the passed form.
      *
-     * @param string           $ref                name of the control
-     * @param SimpleXMLElement $edittype           simplexml object corresponding to the QGIS edittype for this field
-     * @param object           $prop               Jelix object with field properties (datatype, required, etc.)
-     * @param object|array|string $aliasXml        simplexml object corresponding to the QGIS alias for this field
-     * @param string           $defaultValue       the QGIS expression of the default value
-     * @param array            $constraints        the QGIS constraints
-     * @param object           $rendererCategories simplexml object corresponding to the QGIS categories of the renderer
+     * @param string              $ref                name of the control
+     * @param SimpleXMLElement    $edittype           simplexml object corresponding to the QGIS edittype for this field
+     * @param object              $prop               Jelix object with field properties (datatype, required, etc.)
+     * @param array|object|string $aliasXml           simplexml object corresponding to the QGIS alias for this field
+     * @param string              $defaultValue       the QGIS expression of the default value
+     * @param array               $constraints        the QGIS constraints
+     * @param object              $rendererCategories simplexml object corresponding to the QGIS categories of the renderer
      */
-    public function __construct($ref, $edittype, $prop, $aliasXml = null, $defaultValue=null, $constraints=null, $rendererCategories = null)
+    public function __construct($ref, $edittype, $prop, $aliasXml = null, $defaultValue = null, $constraints = null, $rendererCategories = null)
     {
 
     // Add new editTypes naming convention since QGIS 2.4
@@ -252,7 +252,7 @@ class qgisFormControl
                 else {
                     $this->fieldEditType = (int) $this->edittype->attributes()->type;
                 }
-            } else if ($this->edittype && is_object($this->edittype)) {
+            } elseif ($this->edittype && is_object($this->edittype)) {
                 $this->widgetv2configAttr = $this->edittype->options;
                 $this->fieldEditType = $this->edittype->type;
             } else {
@@ -271,7 +271,7 @@ class qgisFormControl
                     && ($this->widgetv2configAttr->IsMultiline === '0' || $this->widgetv2configAttr->IsMultiline === 'false')) {
                     $this->fieldEditType = 'LineEdit';
                     $markup = $this->qgisEdittypeMap[$this->fieldEditType]['jform']['markup'];
-                } else if (property_exists($this->widgetv2configAttr, 'UseHtml')) {
+                } elseif (property_exists($this->widgetv2configAttr, 'UseHtml')) {
                     $markup = $this->qgisEdittypeMap[$this->fieldEditType]['jform']['markup'][(int) $this->widgetv2configAttr->UseHtml];
                 } else {
                     $markup = $this->qgisEdittypeMap[$this->fieldEditType]['jform']['markup'][0];
@@ -534,7 +534,7 @@ class qgisFormControl
                     }
                 }
                 // Also use "fieldEditable" property
-                else if (property_exists($this->edittype->attributes(), 'widgetv2type') &&
+                elseif (property_exists($this->edittype->attributes(), 'widgetv2type') &&
                         property_exists($this->widgetv2configAttr, 'fieldEditable')
                 ) {
                     $editable = (int) $this->widgetv2configAttr->fieldEditable;
@@ -542,7 +542,7 @@ class qgisFormControl
                         $this->isReadOnly = true;
                     }
                 }
-            } else if ($this->edittype && is_object($this->edittype) && $this->edittype->editable === 0) {
+            } elseif ($this->edittype && is_object($this->edittype) && $this->edittype->editable === 0) {
                 $this->isReadOnly = true;
             }
         }
@@ -610,16 +610,16 @@ class qgisFormControl
             case 'UniqueValuesEditable':
             case 'UniqueValues':
                 $this->uniqueValuesData = array(
-                    'notNull' => False,
-                    'editable' => False,
+                    'notNull' => false,
+                    'editable' => false,
                 );
                 if ($this->fieldEditType === 'UniqueValuesEditable') {
-                    $this->uniqueValuesData['editable'] = True;
+                    $this->uniqueValuesData['editable'] = true;
                 }
                 if (($this->edittype instanceof SimpleXMLElement) && $this->edittype->widgetv2config) {
                     $this->uniqueValuesData['notNull'] = filter_var($this->widgetv2configAttr->notNull, FILTER_VALIDATE_BOOLEAN);
                     $this->uniqueValuesData['editable'] = filter_var($this->widgetv2configAttr->Editable, FILTER_VALIDATE_BOOLEAN);
-                } else if (is_object($this->edittype)) {
+                } elseif (is_object($this->edittype)) {
                     if (property_exists($this->widgetv2configAttr, 'notNull')) {
                         $this->uniqueValuesData['notNull'] = filter_var($this->widgetv2configAttr->notNull, FILTER_VALIDATE_BOOLEAN);
                     }
@@ -646,7 +646,7 @@ class qgisFormControl
                         $v = (string) $value->attributes()->value;
                         $data[$v] = $k;
                     }
-                } else if (is_object($this->edittype)) {
+                } elseif (is_object($this->edittype)) {
                     foreach ($this->widgetv2configAttr->map as $value) {
                         $k = (string) $value->key;
                         $v = (string) $value->value;
@@ -739,10 +739,10 @@ class qgisFormControl
                 $allowMulti = filter_var($this->widgetv2configAttr->AllowMulti, FILTER_VALIDATE_BOOLEAN);
                 $filterExpression = (string) $this->widgetv2configAttr->FilterExpression;
                 $useCompleter = filter_var($this->widgetv2configAttr->UseCompleter, FILTER_VALIDATE_BOOLEAN);
-                $fieldEditable = True;
+                $fieldEditable = true;
                 if (($this->edittype instanceof SimpleXMLElement) && property_exists($this->widgetv2configAttr, 'fieldEditable')) {
                     $fieldEditable = filter_var($this->widgetv2configAttr->fieldEditable, FILTER_VALIDATE_BOOLEAN);
-                } else if (is_object($this->edittype) && property_exists($this->edittype, 'editable')) {
+                } elseif (is_object($this->edittype) && property_exists($this->edittype, 'editable')) {
                     $fieldEditable = filter_var($this->edittype->editable, FILTER_VALIDATE_BOOLEAN);
                 }
 
@@ -765,7 +765,7 @@ class qgisFormControl
                 $orderByValue = filter_var($this->widgetv2configAttr->OrderByValue, FILTER_VALIDATE_BOOLEAN);
                 $Relation = (string) $this->widgetv2configAttr->Relation;
                 $MapIdentification = filter_var($this->widgetv2configAttr->MapIdentification, FILTER_VALIDATE_BOOLEAN);
-                $chainFilters = False;
+                $chainFilters = false;
                 $filters = array();
                 if (($this->edittype instanceof SimpleXMLElement)) {
                     if (property_exists($this->edittype->widgetv2config, 'FilterFields')) {
@@ -774,7 +774,7 @@ class qgisFormControl
                         }
                         $chainFilters = filter_var($this->edittype->widgetv2config->FilterFields->attributes()->ChainFilters, FILTER_VALIDATE_BOOLEAN);
                     }
-                } else if (is_object($this->edittype)) {
+                } elseif (is_object($this->edittype)) {
                     if (property_exists($this->widgetv2configAttr, 'FilterFields')) {
                         $filters = $this->widgetv2configAttr->FilterFields;
                     }

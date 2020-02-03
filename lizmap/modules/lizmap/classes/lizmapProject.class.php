@@ -138,7 +138,6 @@ class lizmapProject extends qgisProject
         'relations', 'themes', 'layersOrder', 'printCapabilities', 'locateByLayer', 'formFilterLayers',
         'editionLayers', 'attributeLayers', 'useLayerIDs', 'layers', 'data', 'cfg', 'qgisProjectVersion', );
 
-
     /**
      * version of the format of data stored in the cache.
      *
@@ -177,10 +176,10 @@ class lizmapProject extends qgisProject
         if (jApp::config()->isWindows) {
             // Cache backends don't support '\'
             $fileKey = str_replace('\\', '/', $file);
-        }
-        else {
+        } else {
             $fileKey = $file;
         }
+
         try {
             $data = jCache::get($fileKey, 'qgisprojects');
         } catch (Exception $e) {
@@ -213,7 +212,7 @@ class lizmapProject extends qgisProject
             }
         } else {
             foreach ($this->cachedProperties as $prop) {
-                if(array_key_exists($prop, $data)){
+                if (array_key_exists($prop, $data)) {
                     $this->{$prop} = $data[$prop];
                 }
             }
@@ -231,6 +230,7 @@ class lizmapProject extends qgisProject
             // Cache backends don't support '\'
             $file = str_replace('\\', '/', $file);
         }
+
         try {
             jCache::delete($file, 'qgisprojects');
         } catch (Exception $e) {
@@ -279,13 +279,13 @@ class lizmapProject extends qgisProject
 
         if (!file_exists($qgs_path) ||
             !file_exists($qgs_path.'.cfg')) {
-            throw new UnknownLizmapProjectException("Files of project ${key} does not exists");
+            throw new UnknownLizmapProjectException("Files of project {$key} does not exists");
         }
 
         $config = jFile::read($qgs_path.'.cfg');
         $this->cfg = json_decode($config);
         if ($this->cfg === null) {
-            throw new UnknownLizmapProjectException(".qgs.cfg File of project ${key} has invalid content");
+            throw new UnknownLizmapProjectException(".qgs.cfg File of project {$key} has invalid content");
         }
 
         $configOptions = $this->cfg->options;
@@ -340,7 +340,7 @@ class lizmapProject extends qgisProject
         if ($shortNames && count($shortNames) > 0) {
             foreach ($shortNames as $sname) {
                 $sname = (string) $sname;
-                $xmlLayer = $qgs_xml->xpath("//maplayer[shortname='${sname}']");
+                $xmlLayer = $qgs_xml->xpath("//maplayer[shortname='{$sname}']");
                 if (count($xmlLayer) == 0) {
                     continue;
                 }
@@ -354,7 +354,7 @@ class lizmapProject extends qgisProject
 
         $layerWithOpacities = $qgs_xml->xpath('//maplayer/layerOpacity[.!=1]/parent::*');
         if ($layerWithOpacities && count($layerWithOpacities) > 0) {
-            foreach( $layerWithOpacities as $layerWithOpacitiy ) {
+            foreach ($layerWithOpacities as $layerWithOpacitiy) {
                 $name = (string) $layerWithOpacitiy->layername;
                 if (property_exists($this->cfg->layers, $name)) {
                     $opacity = (float) $layerWithOpacitiy->layerOpacity;
@@ -979,7 +979,7 @@ class lizmapProject extends qgisProject
 
         $config['dataviz'] = array(
             'location' => 'dock',
-            'theme' => 'dark'
+            'theme' => 'dark',
         );
         if (property_exists($this->cfg->options, 'datavizLocation')
             and in_array($this->cfg->options->datavizLocation, array('dock', 'bottomdock', 'right-dock'))
@@ -1213,7 +1213,7 @@ class lizmapProject extends qgisProject
                     );
 
                     // store mapping between uuid and id
-                    $mapUuidId = [];
+                    $mapUuidId = array();
                     // get layout maps
                     $lMaps = $layout->xpath('LayoutItem[@type="65639"]');
                     if ($lMaps && count($lMaps) > 0) {
@@ -1222,7 +1222,7 @@ class lizmapProject extends qgisProject
                             $lMapSize = explode(',', $lMap['size']);
                             $ptMap = array(
                                 'id' => 'map'.(string) count($printTemplate['maps']),
-                                'uuid' => (string)$lMap['uuid'],
+                                'uuid' => (string) $lMap['uuid'],
                                 'width' => (int) $lMapSize[0],
                                 'height' => (int) $lMapSize[1],
                             );
@@ -1249,10 +1249,12 @@ class lizmapProject extends qgisProject
                         }
                         // Modifying overviewMap to id instead of uuid
                         foreach ($printTemplate['maps'] as $ptMap) {
-                            if (!array_key_exists('overviewMap', $ptMap))
+                            if (!array_key_exists('overviewMap', $ptMap)) {
                                 continue;
+                            }
                             if (!array_key_exists($ptMap['overviewMap'], $mapUuidId)) {
                                 unset($ptMap['overviewMap']);
+
                                 continue;
                             }
                             $ptMap['overviewMap'] = $mapUuidId[$ptMap['overviewMap']];
@@ -1320,7 +1322,7 @@ class lizmapProject extends qgisProject
      */
     protected function getXmlLayer2($xml, $layerId)
     {
-        return $xml->xpath("//maplayer[id='${layerId}']");
+        return $xml->xpath("//maplayer[id='{$layerId}']");
     }
 
     protected function readLocateByLayers($xml, $cfg)
@@ -1387,7 +1389,6 @@ class lizmapProject extends qgisProject
 
             // Add data into formFilterLayers from configuration
             $formFilterLayers = $cfg->formFilterLayers;
-
         }
 
         return $formFilterLayers;
@@ -1479,7 +1480,7 @@ class lizmapProject extends qgisProject
             if ($customOrderZero->attributes()->enabled == 1) {
                 $items = $customOrderZero->xpath('//item');
                 $lo = 0;
-                foreach  ($items as $layerI) {
+                foreach ($items as $layerI) {
                     // Get layer name from config instead of XML for possible embedded layers
                     $name = $this->getLayerNameByIdFromConfig($layerI);
                     if ($name) {
@@ -1490,7 +1491,7 @@ class lizmapProject extends qgisProject
             } else {
                 return $layersOrder;
             }
-        } else if ($this->qgisProjectVersion >= 20400) { // For QGIS >=2.4, new item layer-tree-canvas
+        } elseif ($this->qgisProjectVersion >= 20400) { // For QGIS >=2.4, new item layer-tree-canvas
             $customOrder = $xml->xpath('//layer-tree-canvas/custom-order');
             if (count($customOrder) == 0) {
                 return $layersOrder;
@@ -1659,7 +1660,7 @@ class lizmapProject extends qgisProject
                 $externalSearch = array(
                     'type' => 'BAN',
                     'service' => 'lizmapBan',
-                    'url' => jUrl::get('lizmap~ban:search')
+                    'url' => jUrl::get('lizmap~ban:search'),
                 );
             }
             $configJson->options->searches[] = (object) $externalSearch;
@@ -1726,7 +1727,7 @@ class lizmapProject extends qgisProject
      */
     public function getComposer($title)
     {
-        $xmlComposer = $this->getXml()->xpath("//Composer[@title='${title}']");
+        $xmlComposer = $this->getXml()->xpath("//Composer[@title='{$title}']");
         if ($xmlComposer) {
             return $xmlComposer[0];
         }

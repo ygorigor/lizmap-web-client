@@ -95,10 +95,10 @@ class qgisProject
         if (jApp::config()->isWindows) {
             // Cache backends don't support '\'
             $fileKey = str_replace('\\', '/', $file);
-        }
-        else {
+        } else {
             $fileKey = $file;
         }
+
         try {
             $data = jCache::get($fileKey, 'qgisprojects');
         } catch (Exception $e) {
@@ -139,6 +139,7 @@ class qgisProject
             // Cache backends don't support '\'
             $file = str_replace('\\', '/', $file);
         }
+
         try {
             jCache::delete($file, 'qgisprojects');
         } catch (Exception $e) {
@@ -325,10 +326,10 @@ class qgisProject
         if ($layer && array_key_exists('embedded', $layer) && $layer['embedded'] == 1) {
             $qgsProj = new qgisProject(realpath(dirname($this->path).DIRECTORY_SEPARATOR.$layer['projectPath']));
 
-            return $qgsProj->getXml()->xpath("//maplayer[id='${layerId}']");
+            return $qgsProj->getXml()->xpath("//maplayer[id='{$layerId}']");
         }
 
-        return $this->getXml()->xpath("//maplayer[id='${layerId}']");
+        return $this->getXml()->xpath("//maplayer[id='{$layerId}']");
     }
 
     /**
@@ -344,7 +345,7 @@ class qgisProject
      */
     public function getXmlLayerByKeyword($key)
     {
-        return $this->getXml()->xpath("//maplayer/keywordList[value='${key}']/parent::*");
+        return $this->getXml()->xpath("//maplayer/keywordList[value='{$key}']/parent::*");
     }
 
     /**
@@ -360,7 +361,7 @@ class qgisProject
      */
     public function getXmlRelation($relationId)
     {
-        return $this->getXml()->xpath("//relation[@id='${relationId}']");
+        return $this->getXml()->xpath("//relation[@id='{$relationId}']");
     }
 
     /**
@@ -502,7 +503,7 @@ class qgisProject
                 }
             }
             $WMSKeywordList = implode(', ', $values);
-            
+
             $WMSExtent = $qgsLoad->properties->WMSExtent->value[0];
             $WMSExtent .= ', '.$qgsLoad->properties->WMSExtent->value[1];
             $WMSExtent .= ', '.$qgsLoad->properties->WMSExtent->value[2];
@@ -571,7 +572,7 @@ class qgisProject
         $xmlThemes = $xml->xpath('//visibility-presets');
         $themes = array();
 
-        if($xmlThemes){
+        if ($xmlThemes) {
             foreach ($xmlThemes[0] as $theme) {
                 $themeObj = $theme->attributes();
                 if (!array_key_exists((string) $themeObj->name, $themes)) {
@@ -583,7 +584,7 @@ class qgisProject
                     $layerObj = $layer->attributes();
                     $themes[(string) $themeObj->name]['layers'][(string) $layerObj->id] = array(
                         'style' => (string) $layerObj->style,
-                        'expanded' => (string) $layerObj->expanded
+                        'expanded' => (string) $layerObj->expanded,
                     );
                 }
 
@@ -593,6 +594,7 @@ class qgisProject
                     $themes[(string) $themeObj->name]['expandedGroupNode'][] = (string) $expandedGroupNodeObj->id;
                 }
             }
+
             return $themes;
         }
 
@@ -744,27 +746,27 @@ class qgisProject
                     }
 
                     if (isset($xmlLayer->aliases->alias)) {
-                        foreach($xmlLayer->aliases->alias as $alias) {
+                        foreach ($xmlLayer->aliases->alias as $alias) {
                             $aliases[(string) $alias['field']] = (string) $alias['name'];
                         }
                     }
 
                     if (isset($xmlLayer->defaults->default)) {
-                        foreach($xmlLayer->defaults->default as $default) {
+                        foreach ($xmlLayer->defaults->default as $default) {
                             $defaults[(string) $default['field']] = (string) $default['expression'];
                         }
                     }
 
                     if (isset($xmlLayer->constraints->constraint)) {
-                        foreach($xmlLayer->constraints->constraint as $constraint) {
+                        foreach ($xmlLayer->constraints->constraint as $constraint) {
                             $c = array(
                                 'constraints' => 0,
                                 'notNull' => false,
                                 'unique' => false,
-                                'exp' => false
+                                'exp' => false,
                             );
                             $c['constraints'] = (int) $constraint['constraints'];
-                            if ( $c['constraints'] > 0 ) {
+                            if ($c['constraints'] > 0) {
                                 $c['notNull'] = ((int) $constraint['notnull_strength'] > 0);
                                 $c['unique'] = ((int) $constraint['unique_strength'] > 0);
                                 $c['exp'] = ((int) $constraint['exp_strength'] > 0);

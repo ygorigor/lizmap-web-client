@@ -13,7 +13,7 @@ class mapsCtrl extends jController
 {
     // Configure access via jacl2 rights management
     public $pluginParams = array(
-        '*' => array('jacl2.rights.and' => ['lizmap.admin.access', 'lizmap.admin.repositories.view']),
+        '*' => array('jacl2.rights.and' => array('lizmap.admin.access', 'lizmap.admin.repositories.view')),
         'createSection' => array('jacl2.rights' => 'lizmap.admin.repositories.create'),
         'modifySection' => array('jacl2.right' => 'lizmap.admin.repositories.update'),
         'editSection' => array('jacl2.rights.or' => array('lizmap.admin.repositories.create', 'lizmap.admin.repositories.update')),
@@ -29,7 +29,7 @@ class mapsCtrl extends jController
     protected $lizmapClientPrefix = 'lizmap.repositories|lizmap.tools';
 
     /**
-     * Display the list of repositories and maps
+     * Display the list of repositories and maps.
      */
     public function index()
     {
