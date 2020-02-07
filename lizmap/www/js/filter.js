@@ -3,24 +3,21 @@ var lizLayerFilterTool = function() {
     lizMap.events.on({
         'uicreated':function(){
 
-        if (typeof variable != "undefined")
-            return true;
+            if (typeof variable != "undefined")
+                return true;
 
+            // Launch LayerFilter feature
+            addLayerFilterToolInterface();
+            launchLayerFilterTool(filterConfigData.layerId);
 
-        // Launch LayerFilter feature
-        addLayerFilterToolInterface();
-        launchLayerFilterTool(filterConfigData.layerId);
-
-        // Listen to the layer selector changes
-        $('#liz-filter-layer-selector').change(function(){
-            deactivateFilter();
-            filterConfigData.layerId = $(this).val();
-            launchLayerFilterTool($(this).val());
-        });
+            // Listen to the layer selector changes
+            $('#liz-filter-layer-selector').change(function(){
+                deactivateFilter();
+                filterConfigData.layerId = $(this).val();
+                launchLayerFilterTool($(this).val());
+            });
 
         } // uicreated
-
-
 
     });
 
@@ -201,7 +198,7 @@ var lizLayerFilterTool = function() {
         return html;
     }
 
-        function getFormFieldFooter(){
+    function getFormFieldFooter(){
         var html = '';
         html+= '</p>';
         html+= '</div>';
@@ -211,7 +208,6 @@ var lizLayerFilterTool = function() {
 
     // Get the HTML form element for the date field type
     function dateFormInput(field_item){
-
         var sdata = {
             request: 'getMinAndMaxValues',
             layerId: field_item.layerId,
@@ -346,7 +342,7 @@ var lizLayerFilterTool = function() {
             var autocompleteData = [];
             for(var a in result){
                 var feat = result[a];
-                    if (feat['v'] === null || !feat['v'] || (typeof feat['v'] === 'string' && feat['v'].trim() === '') )
+                if (feat['v'] === null || !feat['v'] || (typeof feat['v'] === 'string' && feat['v'].trim() === '') )
                     continue;
                 autocompleteData.push(feat['v']);
             }
@@ -356,7 +352,7 @@ var lizLayerFilterTool = function() {
                 delay: 200,
                 minLength: 2,
                 select: function( event, ui ) {
-                        $(this).val(ui.item.value);
+                    $(this).val(ui.item.value);
                     $(this).change();
                 }
             });
@@ -875,11 +871,11 @@ var lizLayerFilterTool = function() {
                     lizMap.updateContentSize();
                 }
             },
-                rightdockclosed: function() {
+            rightdockclosed: function() {
             },
-                minidockclosed: function() {
+            minidockclosed: function() {
             },
-                layerfeatureremovefilter: function(){
+            layerfeatureremovefilter: function(){
                 var layerId = filterConfigData.layerId;;
 
                 // We need to reset the form
@@ -1188,7 +1184,6 @@ var lizLayerFilterTool = function() {
         lizMap.map.zoomToExtent(extent);
         return false;
     }
-
 
     // Returned public object
     var obj = {
