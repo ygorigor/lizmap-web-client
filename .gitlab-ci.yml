@@ -18,6 +18,11 @@ build:
     - make build
   environment:
     name: snap
+  artifacts:
+    name: "lizmap-web-client-${CI_COMMIT_SHA}-js"
+    paths:
+      - lizmap/www/assets/js/lizmap.js
+      - lizmap/www/assets/js/lizmap.js.map
   tags:
     - fabric
 
@@ -27,6 +32,11 @@ tests:
     - make tests
   environment:
     name: snap
+  cache:
+    key: "tests-$CI_COMMIT_REF_SLUG"
+    paths:
+      - tests/units/vendor/
+      - tests/units/composer.lock
   dependencies:
     - build
   tags:
@@ -39,6 +49,7 @@ package:
   environment:
     name: snap
   dependencies:
+    - build
     - tests
   artifacts:
     name: "lizmap-web-client-${CI_COMMIT_SHA}"

@@ -107,7 +107,8 @@ build: debug
 	cd assets/ && npm run build
 
 tests: debug build
-	@echo "No tests yet. All is ok."
+	composer install --working-dir=tests/units/ --prefer-dist --no-ansi --no-interaction --ignore-platform-reqs --no-dev --no-suggest --no-progress
+	cd tests/units/ && php vendor/bin/phpunit
 
 clean:
 	rm -rf $(STAGE)
@@ -126,6 +127,7 @@ $(DIST):
 	rm -rf $(DIST)/lizmap/www/cache/images/* && touch $(DIST)/lizmap/www/cache/images/.empty
 	rm -rf $(DIST)/lizmap/www/document/* && touch $(DIST)/lizmap/www/document/.empty
 	echo $(LIZMAP_VERSION) > $(DIST)/VERSION
+	chmod -R o-w $(DIST)/
 
 $(GENERIC_PACKAGE_DIR): $(DIST)
 	mkdir -p $(GENERIC_PACKAGE_DIR)
