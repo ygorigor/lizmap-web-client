@@ -44,5 +44,6 @@ docker/*.zip
 tests/units/vendor/
 tests/units/composer.lock
 lizmap/sync.ffs_db
-
+tests/qgis-projects/*
+!tests/qgis-projects/.empty
 assets/node_modules/

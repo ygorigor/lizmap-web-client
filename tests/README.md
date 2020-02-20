@@ -27,7 +27,7 @@ Then, in your browser, go to `http://lizmap.local:8130/`.
 If you want to use pgadmin or any other postgresql client, access credentials are:
 
 - host: `lizmap.local`
-- port: 8131
+- port: 8132
 - database: `lizmap`
 - user: `lizmap`
 - password: `lizmap1234!`
@@ -99,3 +99,9 @@ section.
 
 You can inspect the content of Redis with `lizmap-ctl redis-cli`.
  
+Testing qgis projects
+======================
+
+Put your projects into `tests/qgis_projects/rep1/` (replace `rep1` by the name 
+of your choice), and then you can declare `rep1` projects into the admin page
+of Lizmap, or in its `var/config/lizmapConfig.ini.php`
