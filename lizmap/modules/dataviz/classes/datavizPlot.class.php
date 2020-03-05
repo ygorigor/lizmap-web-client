@@ -27,23 +27,11 @@ class datavizPlot
     protected $traces = array();
 
     protected $x_property_name;
-
     protected $y_property_name;
-
     protected $z_property_name;
 
-    protected $y_field;
-
-    protected $x_field;
-
-    protected $z_field;
-
-    protected $aggregation;
-
     protected $y_fields = array();
-
     protected $x_fields = array();
-
     protected $z_fields = array();
 
     protected $colors = array();
@@ -56,21 +44,25 @@ class datavizPlot
 
     protected $y_mandatory = array('scatter', 'box', 'bar', 'pie', 'histogram2d', 'polar', 'sunburst');
 
+    protected $aggregation;
+    protected $display_legend;
+    protected $stacked;
+    protected $horizontal;
+
     /**
      * datavizPlot constructor.
      *
-     * @param string     $repository
-     * @param string     $project
-     * @param string     $layerId
-     * @param string     $x_field
-     * @param string     $y_field
-     * @param array      $colors
-     * @param array      $colorfields
-     * @param string     $title
-     * @param null       $layout
-     * @param null       $aggregation
-     * @param null       $data
-     * @param null|mixed $z_field
+     * @param string $repository
+     * @param string $project
+     * @param string $layerId
+     * @param string $x_field
+     * @param string $y_field
+     * @param array  $colors
+     * @param array  $colorfields
+     * @param string $title
+     * @param null   $layout
+     * @param null   $aggregation
+     * @param null   $data
      *
      * @throws jExceptionSelector
      */
@@ -78,14 +70,7 @@ class datavizPlot
         $repository,
         $project,
         $layerId,
-        $x_field,
-        $y_field,
-        $z_field = null,
-        $colors = array(),
-        $colorfields = array(),
-        $title = 'plot title',
-        $layout = null,
-        $aggregation = null,
+        $plotConfig,
         $data = null
     ) {
 
@@ -95,38 +80,93 @@ class datavizPlot
             return false;
         }
         $this->lproj = $lproj;
+        // Parse plot config
+        $this->parsePlotConfig($plotConfig);
 
         // Get layer data
-        $this->layerId = $layerId;
         $this->parseLayer($layerId);
 
-        $this->y_field = $y_field;
-        $this->x_field = $x_field;
-        $this->z_field = $z_field;
-        $this->aggregation = $aggregation;
-        $this->colors = $colors;
-        $this->colorfields = $colorfields;
+        // layout and data (use default if none given)
+        $this->setLayout($this->layout);
+        $this->setData($data);
 
-        // Get the field(s) given by the user to build traces
-        $x_fields = array_map('trim', explode(',', $this->x_field));
+        return true;
+    }
+
+    private function parsePlotConfig($plotConfig) {
+        $this->layerId = $plotConfig['layer_id'];
+        $this->setTitle($plotConfig['title']);
+
+        $x_field = $plotConfig['plot']['x_field'];
+        $y_field = $plotConfig['plot']['y_field'];
+        $y2_field = null;
+        if (array_key_exists('y2_field', $plotConfig['plot'])) {
+            $y2_field = $plotConfig['plot']['y2_field'];
+        }
+        if (!empty($y2_field)) {
+            $y_field = $y_field.','.$y2_field;
+        }
+        $z_field = null;
+        if (array_key_exists('z_field', $plotConfig['plot'])) {
+            $z_field = $plotConfig['plot']['z_field'];
+        }
+
+        // Explode string list of fields into arrays
+        $x_fields = array_map('trim', explode(',', $x_field));
         if ($x_fields != array('')) {
             $this->x_fields = $x_fields;
         }
-        $y_fields = array_map('trim', explode(',', $this->y_field));
+        $y_fields = array_map('trim', explode(',', $y_field));
         if ($y_fields != array('')) {
             $this->y_fields = $y_fields;
         }
-        $z_fields = array_map('trim', explode(',', $this->z_field));
+        $z_fields = array_map('trim', explode(',', $z_field));
         if ($z_fields != array('')) {
             $this->z_fields = $z_fields;
         }
 
-        // Set title, layout and data (use default if none given)
-        $this->setTitle($title);
-        $this->setLayout($layout);
-        $this->setData($data);
+        // Colors
+        $colors = array();
+        $colorfields = array();
+        if (array_key_exists('color', $plotConfig['plot'])) {
+            $color = $plotConfig['plot']['color'];
+            $colors[] = $color;
+        }
+        if (array_key_exists('colorfield', $plotConfig['plot'])) {
+            $colorfield = $plotConfig['plot']['colorfield'];
+            $colorfields[] = $colorfield;
+        }
+        if (array_key_exists('color2', $plotConfig['plot'])) {
+            $color2 = $plotConfig['plot']['color2'];
+            $colors[] = $color2;
+        }
+        if (array_key_exists('colorfield2', $plotConfig['plot'])) {
+            $colorfield2 = $plotConfig['plot']['colorfield2'];
+            $colorfields[] = $colorfield2;
+        }
+        $this->colors = $colors;
+        $this->colorfields = $colorfields;
 
-        return true;
+        // Optionnal layout additionnal options (legacy code)
+        if (array_key_exists('layout_config', $plotConfig['plot'])) {
+            $this->layout = $plotConfig['plot']['layout_config'];
+        }
+
+        // Aggregation
+        $aggregation = 'sum';
+        if (array_key_exists('aggregation', $plotConfig['plot'])) {
+            $aggregation = $plotConfig['plot']['aggregation'];
+        }
+        $this->aggregation = $aggregation;
+
+        // Show legend
+        $this->display_legend = $plotConfig['plot']['display_legend'];
+
+        // Stacked
+        $this->stacked = $plotConfig['plot']['stacked'];
+
+        // horizontal
+        $this->horizontal = $plotConfig['plot']['horizontal'];
     }
 
     /**
@@ -202,10 +242,9 @@ class datavizPlot
         $layer = $this->lproj->getLayer($this->layerId);
         $aliases = $layer->getAliasFields();
         $name = $field;
-        if (array_key_exists($field, $aliases) and !empty($aliases[$field])) {
+        if (array_key_exists($field, $aliases) and !empty($aliases[$field]) ) {
             $name = $aliases[$field];
         }
-
         return $name;
     }
 
@@ -213,7 +252,7 @@ class datavizPlot
     {
         $layout = array(
             //'title' => $this->title,
-            'showlegend' => true,
+            'showlegend' => $this->display_legend,
             'legend' => array(
                 'orientation' => 'h',
                 'x' => '-0.1',
@@ -231,27 +270,29 @@ class datavizPlot
             ),
         );
 
-        if ($this->type == 'pie' or $this->type == 'sunburst') {
+        if($this->type == 'pie' or $this->type == 'sunburst'){
             $layout['legend']['orientation'] = 'h';
             $layout['legend']['y'] = '-5';
         }
 
-        if ($this->type == 'bar' and count($this->y_fields) > 1) {
+        if ($this->type == 'bar' and $this->horizontal ) {
             $layout['margin']['l'] = 150;
+        }
+        if ($this->type == 'bar'and count($this->y_fields) > 1 and $this->stacked) {
             $layout['barmode'] = 'stack';
         }
 
         if (!in_array($this->type, array('pie', 'bar'))) {
             if (count($this->x_fields) == 1) {
                 $layout['xaxis'] = array(
-                    'title' => $this->getFieldAlias($this->x_field),
+                    'title' => $this->getFieldAlias($this->x_fields[0]),
                 );
             }
         }
         if (!in_array($this->type, array('pie', 'bar'))) {
             if (count($this->y_fields) == 1) {
                 $layout['yaxis'] = array(
-                    'title' => $this->getFieldAlias($this->y_field),
+                    'title' => $this->getFieldAlias($this->y_fields[0]),
                 );
             }
         }
@@ -342,10 +383,10 @@ class datavizPlot
                 'TYPENAME' => $typename,
                 'OUTPUTFORMAT' => 'GeoJSON',
                 'GEOMETRYNAME' => 'none',
-                'PROPERTYNAME' => implode(',', $propertyname),
+                'PROPERTYNAME' => implode(',', $propertyname)
             );
             // Sort by x fields when scatter plot is used
-            if ($this->type == 'scatter') {
+            if($this->type == 'scatter'){
                 $wfsparams['SORTBY'] = ','.implode(',', $this->x_fields);
             }
             if (!empty($this->colorfields)) {
@@ -442,14 +483,13 @@ class datavizPlot
                 $yf = $y_field;
                 // x
                 $xf = null;
-                if (count($this->x_fields) == 1) {
-                    $xf = $this->x_field;
+                if (count($this->x_fields)  == 1) {
+                    $xf = $this->x_fields[0];
                 }
                 // z
                 if (count($this->z_fields) == 1) {
-                    $zf = $this->z_field;
+                    $zf = $this->z_fields[0];
                 }
-
                 $featcolor = null;
                 if (count($this->colorfields) > 0) {
                     $featcolor = $this->colorfields[$yidx];
@@ -458,7 +498,7 @@ class datavizPlot
                 // Revert x and y for horizontal bar plot
                 if (array_key_exists('orientation', $trace) and $trace['orientation'] == 'h') {
                     $xf = $y_field;
-                    $yf = $this->x_field;
+                    $yf = $this->x_fields[0];
                 }
 
                 // Set color
@@ -487,10 +527,8 @@ class datavizPlot
                     $parents_distinct_values = array();
                     $parents_distinct_colors = array();
                 }
-
                 foreach ($features as $feat) {
                     if ($this->type != 'pie' and $this->type != 'sunburst') {
-
                         // Fill in X field
                         if (count($this->x_fields) == 1) {
                             $trace[$this->x_property_name][] = $feat->properties->{$xf};
@@ -498,9 +536,8 @@ class datavizPlot
 
                         // Fill in Y field
                         $trace[$this->y_property_name][] = $feat->properties->{$yf};
-
                         // Fill in Z field
-                        if ($this->z_property_name and count($this->z_fields) == 1) {
+                        if ($this->z_property_name and count($this->z_fields) == 1 ) {
                             $trace[$this->z_property_name][] = $feat->properties->{$zf};
                         }
 
@@ -516,7 +553,6 @@ class datavizPlot
                         // because plotly cannot use aggregations transforms
                         // -> store values in an array to aggregate them afterwards
                         if ($feat->properties->{$xf} != null) {
-
                             // Aggregate - Each time we find a new X, we initialize the value for this x key
                             if (!array_key_exists($feat->properties->{$xf}, $x_aggregate_sum)) {
                                 $x_aggregate_sum[$feat->properties->{$xf}] = 0;
@@ -527,7 +563,7 @@ class datavizPlot
                                 $x_aggregate_stddev[$feat->properties->{$xf}] = 0;
                                 $x_aggregate_median[$feat->properties->{$xf}] = array();
 
-                                if ($this->z_property_name and !empty($zf)) {
+                                if( $this->z_property_name and !empty($zf)){
                                     $x_distinct_parent[$feat->properties->{$xf}] = $feat->properties->{$zf};
                                 }
 
@@ -543,6 +579,7 @@ class datavizPlot
                             ++$x_aggregate_count[$feat->properties->{$xf}];
                             $x_aggregate_last[$feat->properties->{$xf}] = $feat->properties->{$yf};
                             array_push($x_aggregate_median[$feat->properties->{$xf}], $feat->properties->{$yf});
+
                             if ($x_aggregate_min[$feat->properties->{$xf}] > $feat->properties->{$yf}) {
                                 $x_aggregate_min[$feat->properties->{$xf}] = $feat->properties->{$yf};
                             }
@@ -550,7 +587,6 @@ class datavizPlot
                             if ($x_aggregate_max[$feat->properties->{$xf}] < $feat->properties->{$yf}) {
                                 $x_aggregate_max[$feat->properties->{$xf}] = $feat->properties->{$yf};
                             }
-
                             if ($this->type == 'sunburst') {
                                 // Sum up values for distinct labels to compute values for the sunburst parents
                                 if (!array_key_exists($feat->properties->{$zf}, $parents_distinct_values)) {
@@ -589,7 +625,7 @@ class datavizPlot
                     foreach ($x_aggregate_sum as $key => $value) {
                         // x
                         $trace[$this->x_property_name][] = $key;
-                        if ($this->z_property_name) {
+                        if( $this->z_property_name ) {
                             $trace[$this->z_property_name][] = $x_distinct_parent[$key];
                         }
 
@@ -633,20 +669,20 @@ class datavizPlot
                     $colors_before = array('white');
                     $vtotal = 0;
 
-                    foreach ($parents_distinct_values as $z => $v) {
+                    foreach ($parents_distinct_values as $z=>$v) {
                         $labels_before[] = $z;
                         $values_before[] = $v;
                         $parents_before[] = 'Total';
                         $colors_before[] = $parents_distinct_colors[$z];
-                        $vtotal += $v;
-                    }
+                        $vtotal+= $v;
+                    };
                     $values_before[0] = $vtotal;
                     $trace[$this->x_property_name] = array_merge($labels_before, $trace[$this->x_property_name]);
                     $trace[$this->y_property_name] = array_merge($values_before, $trace[$this->y_property_name]);
                     $trace[$this->z_property_name] = array_merge($parents_before, $trace[$this->z_property_name]);
                     $featcolors = array_merge($colors_before, $featcolors);
-                }
 
+                }
                 // set color
                 if (!empty($featcolors)) {
                     if ($this->type == 'bar'
@@ -696,8 +732,9 @@ class datavizPlotScatter extends datavizPlot
     public $type = 'scatter';
 
     protected $x_property_name = 'x';
+
     protected $y_property_name = 'y';
-    protected $z_property_name;
+    protected $z_property_name = null;
 
     protected function getTraceTemplate()
     {
@@ -734,8 +771,9 @@ class datavizPlotBox extends datavizPlot
     public $type = 'box';
 
     protected $x_property_name = 'x';
+
     protected $y_property_name = 'y';
-    protected $z_property_name;
+    protected $z_property_name = null;
 
     protected function getTraceTemplate()
     {
@@ -766,8 +804,9 @@ class datavizPlotBar extends datavizPlot
     public $type = 'bar';
 
     protected $x_property_name = 'x';
+
     protected $y_property_name = 'y';
-    protected $z_property_name;
+    protected $z_property_name = null;
 
     protected function getTraceTemplate()
     {
@@ -794,7 +833,7 @@ class datavizPlotBar extends datavizPlot
             'textinfo' => 'none',
             'orientation' => 'v',
         );
-        if ($this->type == 'bar' and count($this->y_fields) > 1) {
+        if ($this->horizontal) {
             $data['orientation'] = 'h';
         }
 
@@ -818,8 +857,9 @@ class datavizPlotHistogram extends datavizPlot
     public $type = 'histogram';
 
     protected $x_property_name = 'x';
+
     protected $y_property_name = 'y';
-    protected $z_property_name;
+    protected $z_property_name = null;
 
     protected function getTraceTemplate()
     {
@@ -855,8 +895,9 @@ class datavizPlotPie extends datavizPlot
     public $type = 'pie';
 
     protected $x_property_name = 'labels';
+
     protected $y_property_name = 'values';
-    protected $z_property_name;
+    protected $z_property_name = null;
 
     protected function getTraceTemplate()
     {
@@ -868,7 +909,7 @@ class datavizPlotPie extends datavizPlot
             'hoverinfo' => 'label+value+percent',
             'textinfo' => 'value',
             'opacity' => null,
-            'hole' => '0.4',
+            'hole' => '0.4'
         );
     }
 }
@@ -878,8 +919,9 @@ class datavizPlotHistogram2d extends datavizPlot
     public $type = 'histogram2d';
 
     protected $x_property_name = 'x';
+
     protected $y_property_name = 'y';
-    protected $z_property_name;
+    protected $z_property_name = null;
 
     protected function getTraceTemplate()
     {
@@ -899,8 +941,9 @@ class datavizPlotPolar extends datavizPlot
     public $type = 'polar';
 
     protected $x_property_name = 'r';
+
     protected $y_property_name = 't';
-    protected $z_property_name;
+    protected $z_property_name = null;
 
     protected function getTraceTemplate()
     {
@@ -920,6 +963,7 @@ class datavizPlotPolar extends datavizPlot
     }
 }
 
+
 class datavizPlotSunburst extends datavizPlot
 {
     public $type = 'sunburst';
@@ -936,9 +980,9 @@ class datavizPlotSunburst extends datavizPlot
             'values' => array(),
             'labels' => array(),
             'parents' => array(),
-            'branchvalues' => 'total',
+            'branchvalues'=> 'total',
             //'hovertemplate' => "%{label} (%{value:.1f})",
-            'hoverinfo' => 'label+value+percent',
+            'hoverinfo' => "label+value+percent",
             //'textinfo' => 'value',
             'texttemplate' => '%{value:.0f}',
             'opacity' => null,
