@@ -47,3 +47,4 @@ lizmap/sync.ffs_db
 tests/qgis-projects/*
 !tests/qgis-projects/.empty
 assets/node_modules/
+tests/js/node_modules/
