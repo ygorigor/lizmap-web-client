@@ -287,9 +287,9 @@ class datavizPlot
             'plot_bgcolor' => 'rgba(0,0,0,0)',
             'paper_bgcolor' => 'rgba(0,0,0,0)',
             'margin' => array(
-                'l' => 2,
+                'l' => 30,
                 'r' => 20,
-                //'b'=> 150,
+                'b'=> 150,
                 't' => 0,
                 'pad' => 1,
             ),
@@ -302,6 +302,7 @@ class datavizPlot
 
         if ($this->type == 'bar' and $this->horizontal ) {
             $layout['margin']['l'] = 150;
+            $layout['margin']['b'] = 50;
         }
         if ($this->type == 'bar'and count($this->y_fields) > 1 and $this->stacked) {
             $layout['barmode'] = 'stack';
@@ -341,19 +342,6 @@ class datavizPlot
     protected function getTraceTemplate()
     {
         return null;
-    }
-
-    protected function addTraceAggregation()
-    {
-        $this->data[0]['transforms'] = array(
-            array(
-                'type' => 'aggregate',
-                'groups' => 'x',
-                'aggregations' => array(
-                    array('target' => 'y', 'func' => $this->aggregation, 'enabled' => true),
-                ),
-            ),
-        );
     }
 
     public function getData($format = 'raw')
@@ -576,11 +564,11 @@ class datavizPlot
                             $featcolors[] = $feat->properties->{$featcolor};
                         }
                     } else {
-                        // For pie and sunburst chart, we need to manually
+                        // For pie, sunburst, html chart, we need to manually
                         // sum and aggregate values per distinct x values
                         // because plotly cannot use aggregations transforms
                         // -> store values in an array to aggregate them afterwards
-                        if ($feat->properties->{$xf} != null) {
+                        if ($feat->properties->{$xf} != null or $feat->properties->{$xf} == 0) {
                             // Aggregate - Each time we find a new X, we initialize the value for this x key
                             if (!array_key_exists($feat->properties->{$xf}, $x_aggregate_sum)) {
                                 $x_aggregate_sum[$feat->properties->{$xf}] = 0;
@@ -735,19 +723,35 @@ class datavizPlot
                 if ($this->z_property_name and count($trace[$this->z_property_name]) == 0) {
                     $trace[$this->z_property_name] = null;
                 }
+
+                // add aggregation property if aggregation is done client side via dataplotly
+                // Not available for pie, histogram and histogram2d, we have done it manually beforehand in php
+                if ($this->aggregation
+                    and !in_array($this->type, array('pie', 'histogram', 'histogram2d', 'html', 'sunburst'))
+                ) {
+                    $trace['transforms'] = array(
+                        array(
+                            'type' => 'aggregate',
+                            'groups' => $this->x_property_name,
+                            //'groups' => 'x',
+                            'aggregations' => array(
+                                array(
+                                    'target' => $this->y_property_name,
+                                    'func' => $this->aggregation,
+                                    'enabled' => true
+                                )
+                            )
+                        )
+                    );
+                }
+
+
                 $traces[] = $trace;
             }
 
             $this->traces = $traces;
             $this->data = $traces;
 
-            // add aggregation property if aggregation is done client side via dataplotly
-            // Not available for pie, histogram and histogram2d, we have done it manually beforehand in php
-            if ($this->aggregation
-                and !in_array($this->type, array('pie', 'histogram', 'histogram2d'))
-            ) {
-                $this->addTraceAggregation();
-            }
 
             return true;
         }

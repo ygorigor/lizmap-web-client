@@ -138,7 +138,6 @@ var lizDataviz = function() {
                 dv.plots.push(json);
 
                 var plot = buildPlot(target_id, json);
-
                 $('#'+target_id).prev('.dataviz-waiter:first').hide();
             }
         );
@@ -181,7 +180,8 @@ var lizDataviz = function() {
                 // Y value
                 var y_val = trace.y[x];
                 var y_search = '{$yi}'.replace('i', i+1);
-                var y_replacement = y_val;
+                var localeString = dv.config.locale.replace('_', '-')
+                var y_replacement = y_val.toLocaleString(localeString);;
                 html = html.split(y_search).join(y_replacement);
 
                 // Colors
@@ -217,13 +217,14 @@ var lizDataviz = function() {
         if(conf.data.length && conf.data[0]['type'] == 'html'){
             buildHtmlPlot(id, conf.data, conf.layout);
         }else{
+            var plotLocale = dv.config.locale.substring(0, 2)
             Plotly.newPlot(
                 id,
                 conf.data,
                 conf.layout,
                 {
                     displayModeBar: false,
-                    locale: 'fr'
+                    locale: plotLocale
                 }
             );
         }
@@ -292,20 +293,24 @@ var lizDataviz = function() {
 
         // Hide plot when layer not shown
         // Todo: we should not refresh plot or even load it if not visible
-        var pid = parseInt(id.replace('dataviz_plot_', ''));
-        var plot_config = dv.config.layers[pid];
-        if('display_when_layer_visible' in plot_config.plot && optionToBoolean(plot_config.plot.display_when_layer_visible)) {
-            var getLayerConfig = lizMap.getLayerConfigById( plot_config['layer_id'] );
-            if (getLayerConfig) {
-                var layerConfig = getLayerConfig[1];
-                var featureType = getLayerConfig[0];
-                var oLayers = lizMap.map.getLayersByName(layerConfig.cleanname);
-                if(oLayers.length == 1){
-                    var oLayer = oLayers[0];
-                    var lvisibility = oLayer.visibility;
-                    $('#' + id + '_container').toggle(lvisibility);
-                    if(lvisibility){
-                        resizePlot(id);
+        // First check if id begins with dataviz_plot -> main panel
+        // or not -> popup child dataviz: do nothing
+        if (id.substring(0, 13) == 'dataviz_plot_') {
+            var pid = parseInt(id.replace('dataviz_plot_', ''));
+            var plot_config = dv.config.layers[pid];
+            if('display_when_layer_visible' in plot_config.plot && optionToBoolean(plot_config.plot.display_when_layer_visible)) {
+                var getLayerConfig = lizMap.getLayerConfigById( plot_config['layer_id'] );
+                if (getLayerConfig) {
+                    var layerConfig = getLayerConfig[1];
+                    var featureType = getLayerConfig[0];
+                    var oLayers = lizMap.map.getLayersByName(layerConfig.cleanname);
+                    if(oLayers.length == 1){
+                        var oLayer = oLayers[0];
+                        var lvisibility = oLayer.visibility;
+                        $('#' + id + '_container').toggle(lvisibility);
+                        if(lvisibility){
+                            resizePlot(id);
+                        }
                     }
                 }
             }
