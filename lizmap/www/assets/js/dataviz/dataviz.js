@@ -212,22 +212,62 @@ var lizDataviz = function() {
         }
     }
 
+    function resizePlot(id){
+        var d3 = Plotly.d3;
+        var gd = d3.select('#'+id)
+        .style({
+            width: '100%',
+            margin: '0px'
+        });
+        Plotly.Plots.resize(gd.node());
+    }
+
     function buildPlot(id, conf){
         // Build plot with plotly or lizmap
         if(conf.data.length && conf.data[0]['type'] == 'html'){
             buildHtmlPlot(id, conf.data, conf.layout);
         }else{
-            var plotLocale = dv.config.locale.substring(0, 2)
+            var plotLocale = dv.config.locale.substring(0, 2);
+            var plotConfig = {
+                showLink: false,
+                scrollZoom: false,
+                locale: plotLocale,
+                responsive: true,
+                toImageButtonOptions: {
+                    format: 'png', // one of png, svg, jpeg, webp
+                    height: 500,
+                    width: 700,
+                    scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+                },
+                editable: false,
+                modeBarButtonsToRemove: [
+                    'sendDataToCloud','editInChartStudio',
+                    'zoom2d','pan2d','select2d','lasso2d',
+                    'drawclosedpath','drawopenpath','drawline',
+                    'resetScale2d','toggleSpikelines','toggleHover',
+                    'hoverClosestCartesian','hoverCompareCartesian'
+                ],
+                displaylogo: false,
+                doubleClickDelay: 1000
+            };
             Plotly.newPlot(
                 id,
                 conf.data,
                 conf.layout,
-                {
-                    displayModeBar: false,
-                    locale: plotLocale
-                }
+                plotConfig
             );
+
+            var pid = parseInt(id.replace('dataviz_plot_', ''));
+            var plot_config = dv.config.layers[pid];
+            if ('layout' in plot_config.plot && plot_config.plot.layout) {
+                var user_layout = plot_config.plot.layout;
+                //var json_layout = JSON.stringify(user_layout);
+                //var new_layout = JSON.parse(json_layout.replace('"False"', 'false').replace('"True"', 'true'));
+                var new_layout = user_layout;
+                Plotly.relayout(id, new_layout);
+            }
         }
+
 
         // Add events to resize plot when needed
         lizMap.events.on({
@@ -258,6 +298,7 @@ var lizDataviz = function() {
                 resizePlot(id);
             }
         });
+
 
         // Add event to hide/show plots if needed
         lizMap.events.on({
@@ -357,16 +398,6 @@ var lizDataviz = function() {
             }
         }
         return children;
-    }
-
-    function resizePlot(id){
-        var d3 = Plotly.d3;
-        var gd = d3.select('#'+id)
-        .style({
-            width: '100%',
-            margin: '0px'
-        });
-        Plotly.Plots.resize(gd.node());
     }
 
     lizMap.events.on({
