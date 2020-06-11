@@ -38,6 +38,7 @@
   </div>
 
   <div id="map-content">
+    <div id="newOlMap" style="width:1px;height:1px;position: absolute;"></div>
     <div id="map"></div>
 
     <div id="mini-dock">
@@ -61,9 +62,7 @@
     <div id="overview-box">
       <div id="overview-map" title="{@view~map.overviewmap.hover@}"></div>
       <div id="overview-bar">
-        <div id="scaleline" class="olControlScaleLine" style="width:100px; position:relative; bottom:0; top:0; left:0;" title="{@view~map.overviewbar.scaleline.hover@}">
-        </div>
-        <div id="scaletext" class="label" style="position:absolue; bottom:0; top:0; left:100px; right:20px; position:absolute; text-align:center; padding:0.7em 0 0 0;" title="{@view~map.overviewbar.scaletext.hover@}">{@view~map.overviewbar.scaletext.title@}</div>
+       <lizmap-scaleline title="{@view~map.overviewbar.scaletext.hover@}"></lizmap-scaleline>
         <button id="overview-toggle" class="btn" title="{@view~map.overviewbar.displayoverview.hover@}"></button>
       </div>
       <div id="mouseposition-bar">
@@ -78,7 +77,6 @@
         </select>
       </div>
     </div>
-
     <div id="attribution-box">
       <span id="attribution"></span>
       <img src="{$j_themepath.'css/img/logo_footer.png'}" alt=""/>
