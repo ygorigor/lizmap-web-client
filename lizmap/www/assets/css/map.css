@@ -80,6 +80,7 @@ body {
   z-index:1030;
   background:#4A4A4A;
   background:rgba(0,0,0,0.7);
+  overflow: auto;
 }
 #mapmenu > div {
   width: 30px;
@@ -293,11 +294,7 @@ CSS Sprite positions calculated via http://instantsprite.com/ using 20px images 
 
 /* Dock */
 #dock {
-  position:absolute;
-  left:30px;
-  top:0px;
-  bottom:0px;
-
+  position: relative;
   z-index:1040;
   overflow:auto;
   background-color:#4A4A4A;
@@ -305,16 +302,17 @@ CSS Sprite positions calculated via http://instantsprite.com/ using 20px images 
   padding:5px;
   border-left: 1px solid #F0F0F0;
   max-width:30%;
-  right:auto;
-  padding-bottom: 20px;
+  padding-bottom: 5px;
+
+  height: 100%;
+  box-sizing: border-box;
 }
 
 #content.mobile #dock{
-  max-width:100%;
-  bottom:0px;
-  right:0px;
+  max-width:none;
   background-color:#4A4A4A;
   z-index:1100;
+  flex-grow: 1;
 }
 
 body.geolocation-minidock-active #content.mobile #dock{
@@ -400,9 +398,6 @@ SubDock
 */
 #sub-dock{
   display:none;
-  position:absolute;
-  left:30px;
-  top:0px;
   max-height:100%;
   z-index:1001;
   overflow:auto;
@@ -411,7 +406,8 @@ SubDock
   padding:5px;
   border-left: 1px solid #F0F0F0;
   max-width:30%;
-  right:auto;
+
+  align-self: flex-start;
 }
 #content.mobile #sub-dock{
   max-width:100%;
@@ -435,6 +431,10 @@ SubDock
 #sub-dock div.menu-content .btn-mini [class^="icon-"],
 #sub-dock div.menu-content .btn-mini [class*=" icon-"]{
   margin-top: 1px;
+}
+
+#hide-sub-dock{
+  margin-top:5px;
 }
 
 /* Mini-Dock */
@@ -463,34 +463,23 @@ SubDock
   display:none;
 }
 
-/* Dock */
+/* Bottom-dock */
 #bottom-dock {
   opacity:0.5;
-  position:absolute;
-  left:300px;
-  right:10px;
-  width:auto;
-  height:auto;
-  bottom:0px;
+  position:relative;
   z-index:5000;
   overflow:auto;
   background-color:#4A4A4A;
   background-color:rgba(0,0,0,0.7);
   padding:5px;
   border-left: 1px solid #F0F0F0;
-}
-#content.right-dock-visible #bottom-dock{
-  right: 30.05%;
-}
-#content.mobile #bottom-dock, #content.right-dock-visible.mobile #bottom-dock{
-  max-width:100%;
-  top:auto;
-  bottom:0px;
-  right:0px;
-  left:30px;
-  width:auto;
-}
 
+  flex-grow: 1;
+  align-self: flex-end;
+
+  transition-property: opacity;
+  transition-duration: .4s;
+}
 
 #bottom-dock-window-buttons {
   display:none;
@@ -508,11 +497,11 @@ SubDock
 }
 
 #bottom-dock.visible {
-  opacity: 1;
   height: 48%;
+}
 
-}#bottom-dock.half-transparent {
-  opacity: 0.5;
+#bottom-dock:hover {
+  opacity: 1;
 }
 
 #bottom-dock.fullsize {
@@ -536,7 +525,7 @@ SubDock
   float : right;
   margin-left: 5px;
 }
-#content.mobile .btn-bottomdock-glue,
+
 #content.mobile .btn-bottomdock-size {
   display:none;
 }
@@ -1148,22 +1137,15 @@ transform: none !important;
 
 /* Right Dock */
 #right-dock {
-  position: absolute;
-  bottom: 0px;
-  right: 0px;
-  top:0px;
+  margin-left: auto;
   width:30%;
-  height:100%;
   background: #4A4A4A;
 }
+
 #content.mobile #right-dock{
-  max-width:100%;
-  top:auto;
-  bottom:0px;
-  right:0px;
-  left:30px;
-  width:auto;
-  z-index:1100;
+  max-width:none;
+  width: auto;
+  z-index:1099;
 }
 
 #right-dock > .tabbable{
@@ -1413,21 +1395,28 @@ transform: none !important;
 
 #dock div.tabbable {
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 #dock-content {
   height: 100%;
+  flex-grow: 1;
+}
+
+#docks-wrapper{
+  display: flex;
+  position: absolute;
+  left: 30px;
+  width: calc(100% - 30px);
+  height: 100%;
 }
 
 #switcher {
-  overflow : auto;
   height: 100%;
-/*
-  border : solid 1px #606060;
-*/
 }
 #switcher-layers {
-  padding-left: 19px;/**/
+  padding-left: 19px;
 }
 
 #switcher-layers-actions {
@@ -1457,8 +1446,15 @@ transform: none !important;
   background-color: #FFFFFF;
 }
 
+#switcher-layers-container{
+  max-height: calc(100% - 71px);
+  display: flex;
+  flex-direction: column;
+}
+
 #switcher-layers-container > div.menu-content {
   background-color:#F0F0F0;
+  overflow: hidden auto;
 }
 #switcher-layers ul {
   margin-left:10px;
