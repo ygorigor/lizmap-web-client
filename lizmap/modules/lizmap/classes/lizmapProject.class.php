@@ -500,6 +500,11 @@ class lizmapProject extends qgisProject
 
     public function findLayerByAnyName($name)
     {
+        // name null or empty string
+        if ($name == null || empty($name)) {
+            return null;
+        }
+
         // Get by name ie as written in QGIS Desktop legend
         $layer = $this->findLayerByName($name);
         if ($layer) {
@@ -530,6 +535,11 @@ class lizmapProject extends qgisProject
 
     public function findLayerByName($name)
     {
+        // name null or empty string
+        if ($name == null || empty($name)) {
+            return null;
+        }
+
         if (property_exists($this->cfg->layers, $name)) {
             return $this->cfg->layers->{$name};
         }
@@ -539,6 +549,11 @@ class lizmapProject extends qgisProject
 
     public function findLayerByShortName($shortName)
     {
+        // short name null or empty string
+        if ($shortName == null || empty($shortName)) {
+            return null;
+        }
+
         foreach ($this->cfg->layers as $layer) {
             if (!property_exists($layer, 'shortname')) {
                 continue;
@@ -553,6 +568,11 @@ class lizmapProject extends qgisProject
 
     public function findLayerByTitle($title)
     {
+        // title null or empty string
+        if ($title == null || empty($title)) {
+            return null;
+        }
+
         foreach ($this->cfg->layers as $layer) {
             if (!property_exists($layer, 'title')) {
                 continue;
@@ -567,6 +587,11 @@ class lizmapProject extends qgisProject
 
     public function findLayerByLayerId($layerId)
     {
+        // layer id null or empty string
+        if ($layerId == null || empty($layerId)) {
+            return null;
+        }
+
         foreach ($this->cfg->layers as $layer) {
             if (!property_exists($layer, 'id')) {
                 continue;
@@ -581,6 +606,11 @@ class lizmapProject extends qgisProject
 
     public function findLayerByTypeName($typeName)
     {
+        // type name null or empty string
+        if ($typeName == null || empty($typeName)) {
+            return null;
+        }
+
         // typeName is layerName
         if (property_exists($this->cfg->layers, $typeName)) {
             return $this->cfg->layers->{$typeName};
