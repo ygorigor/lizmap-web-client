@@ -15,7 +15,6 @@
         <module name="admin"/>
     </dependencies>
     <autoload>
-    <autoload>
         <class name="lizmap" file="classes/lizmap.class.php"/>
         <class name="lizmapLogItem" file="classes/lizmapLogItem.class.php"/>
         <class name="lizmapOGCRequest" file="classes/lizmapOGCRequest.class.php"/>
