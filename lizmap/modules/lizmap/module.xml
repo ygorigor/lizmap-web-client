@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module xmlns="http://jelix.org/ns/module/1.0">
     <info id="info@3liz.com" name="lizmap" createdate="2011-06-15">
-        <version date="2020-04-30">3.4.0-alpha.1</version>
+        <version date="2020-07-03">3.4.0-alpha.2</version>
         <label lang="en_US">lizmap</label>
         <description lang="en_US"/>
         <license URL="http://www.mozilla.org/MPL/">Mozilla Public License</license>
@@ -27,7 +27,7 @@
         <class name="lizmapWMTSRequest" file="classes/lizmapWMTSRequest.class.php"/>
         <class name="lizmapTiler" file="classes/lizmapTiler.class.php"/>
         <class name="qgisMapLayer" file="classes/qgisMapLayer.class.php"/>
-        <class name="qgisVectorLayerDatasource" file="classes/qgisVectorLayerDatasource.class.php" />
+        <class name="qgisVectorLayerDatasource" file="classes/qgisVectorLayerDatasource.class.php"/>
         <class name="qgisVectorLayer" file="classes/qgisVectorLayer.class.php"/>
         <class name="qgisForm" file="classes/qgisForm.class.php"/>
         <class name="qgisFormControl" file="classes/qgisFormControl.class.php"/>
