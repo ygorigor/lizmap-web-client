@@ -53,3 +53,4 @@ tests/qgis-projects/*
 assets/node_modules/
 tests/js/node_modules/
 .stfolder
+/.stignore
