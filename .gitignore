@@ -54,3 +54,4 @@ assets/node_modules/
 tests/js/node_modules/
 .stfolder
 /.stignore
+/lizmap/var/config/altiProfil.ini.php
