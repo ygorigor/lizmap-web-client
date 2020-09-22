@@ -1,6 +1,6 @@
 <?php
 /**
- * QGIS Form listener
+ * QGIS Form listener.
  *
  * @author    3liz
  * @copyright 2020 3liz
@@ -11,11 +11,17 @@
  */
 class qgisFormListener extends jEventListener
 {
-
     public function onjformsPrepareToFillDynamicList($event)
     {
         $form = $event->getParam('form');
         $privateData = $form->getContainer()->privateData;
+        if (!$privateData ||
+            !array_key_exists('liz_repository', $privateData) ||
+            !array_key_exists('liz_project', $privateData) ||
+            !array_key_exists('liz_layerId', $privateData)) {
+            // it's not a QGIS Form
+            return;
+        }
 
         $repository = $privateData['liz_repository'];
         $project = $privateData['liz_project'];
@@ -23,10 +29,21 @@ class qgisFormListener extends jEventListener
         $featureId = $privateData['liz_featureId'];
 
         $lrep = lizmap::getRepository($repository);
+        if (!$lrep) {
+            // Unknown repository
+            return;
+        }
         $lproj = lizmap::getProject($repository.'~'.$project);
+        if (!$lproj) {
+            // Unknown project
+            return;
+        }
         $layer = $lproj->getLayer($layerId);
+        if (!$layer) {
+            // Unknown layer
+            return;
+        }
 
         $qgisForm = new qgisForm($layer, $form, $featureId, jAcl2::check('lizmap.tools.loginFilteredLayers.override', $lrep->getKey()));
     }
-
 }
