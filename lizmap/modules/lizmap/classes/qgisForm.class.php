@@ -584,6 +584,15 @@ class qgisForm implements qgisFormControlsInterface
                 $constraintExpressions[$fieldName] = $constraints['exp_value'];
             }
         }
+        // Get filter by login
+        $expByUserKey = 'filterByLogin';
+        $expByUser = qgisExpressionUtils::getExpressionByUser($this->layer, true);
+        if ($expByUser !== '') {
+            while (array_key_exists($expByUserKey, $constraintExpressions)) {
+                $expByUserKey .= '@';
+            }
+            $constraintExpressions[$expByUserKey] = $expByUser;
+        }
 
         // Evaluate constraint expressions
         if (count($constraintExpressions) > 0) {
@@ -607,6 +616,15 @@ class qgisForm implements qgisFormControlsInterface
                 if ($result === 1) {
                     continue;
                 }
+                if ($fieldName === $expByUserKey) {
+                    $project = $this->layer->getProject();
+                    $loginFilterConfig = $project->getLoginFilteredConfig($this->layer->getName());
+                    $form->setErrorOn($loginFilterConfig->filterAttribute, jLocale::get('view~edition.message.error.feature.editable'));
+
+                    $check = false;
+
+                    continue;
+                }
                 $constraints = $this->getConstraints($fieldName);
                 if ($constraints['exp_desc'] !== '') {
                     $form->setErrorOn($fieldName, $constraints['exp_desc']);
@@ -624,10 +642,11 @@ class qgisForm implements qgisFormControlsInterface
      * Save the form to the database.
      *
      * @param null|mixed $feature
+     * @param array      $modifiedControls
      *
      * @return array|false|int value of primary key or false if an error occured
      */
-    public function saveToDb($feature = null)
+    public function saveToDb($feature = null, $modifiedControls = array())
     {
         if (!$this->dbFieldsInfo) {
             throw new Exception('Save to database can\'t be done for the layer "'.$this->layer->getName().'"!');
@@ -648,13 +667,9 @@ class qgisForm implements qgisFormControlsInterface
         $dataFields = $this->dbFieldsInfo->dataFields;
         $geometryColumn = $this->dbFieldsInfo->geometryColumn;
 
-        // Get list of fields diplayed in form
+        // Get list of modified fields
         // can be an empty list
-        $formFields = array();
-        $attributeEditorForm = $this->getAttributesEditorForm();
-        if ($attributeEditorForm) {
-            $formFields = $attributeEditorForm->getFields();
-        }
+        $modifiedFields = array_keys($modifiedControls);
 
         // Get list of fields which are not primary keys
         $fields = array();
@@ -680,8 +695,8 @@ class qgisForm implements qgisFormControlsInterface
             // For other column than geometry does not add it
             // if it's column not in form
             if ($fieldName != $geometryColumn
-                && count($formFields) != 0
-                && !in_array($fieldName, $formFields)) {
+                && count($modifiedFields) != 0
+                && !in_array($fieldName, $modifiedFields)) {
                 continue;
             }
 
