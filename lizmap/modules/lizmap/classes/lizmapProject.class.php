@@ -183,11 +183,11 @@ class lizmapProject extends qgisProject
             jLog::logEx($e, 'error');
         }
 
-        if ($data === false ||
-            $data['qgsmtime'] < filemtime($file) ||
-            $data['qgscfgmtime'] < filemtime($file.'.cfg') ||
-            !isset($data['format_version']) ||
-            $data['format_version'] != self::CACHE_FORMAT_VERSION
+        if ($data === false
+            || $data['qgsmtime'] < filemtime($file)
+            || $data['qgscfgmtime'] < filemtime($file.'.cfg')
+            || !isset($data['format_version'])
+            || $data['format_version'] != self::CACHE_FORMAT_VERSION
         ) {
             // FIXME reading XML could take time, so many process could
             // read it and construct the cache at the same time. We should
@@ -246,8 +246,8 @@ class lizmapProject extends qgisProject
             return $this->xml;
         }
         $qgs_path = $this->repository->getPath().$this->key.'.qgs';
-        if (!file_exists($qgs_path) ||
-            !file_exists($qgs_path.'.cfg')) {
+        if (!file_exists($qgs_path)
+            || !file_exists($qgs_path.'.cfg')) {
             throw new Error('Files of project '.$this->key.' does not exists');
         }
         $xml = simplexml_load_file($qgs_path);
@@ -269,8 +269,8 @@ class lizmapProject extends qgisProject
     {
         $qgs_path = $rep->getPath().$key.'.qgs';
 
-        if (!file_exists($qgs_path) ||
-            !file_exists($qgs_path.'.cfg')) {
+        if (!file_exists($qgs_path)
+            || !file_exists($qgs_path.'.cfg')) {
             throw new UnknownLizmapProjectException("Files of project ${key} does not exists");
         }
 
@@ -424,9 +424,9 @@ class lizmapProject extends qgisProject
         }
         //unset displayInLegend for geometryType none or unknown
         foreach ($this->cfg->layers as $key => $obj) {
-            if (property_exists($this->cfg->layers->{$key}, 'geometryType') &&
-                 ($this->cfg->layers->{$key}->geometryType == 'none' ||
-                     $this->cfg->layers->{$key}->geometryType == 'unknown')
+            if (property_exists($this->cfg->layers->{$key}, 'geometryType')
+                 && ($this->cfg->layers->{$key}->geometryType == 'none'
+                     || $this->cfg->layers->{$key}->geometryType == 'unknown')
             ) {
                 $this->cfg->layers->{$key}->displayInLegend = 'False';
             }
@@ -695,8 +695,7 @@ class lizmapProject extends qgisProject
     public function hasAtlasEnabled()
     {
         if ((property_exists($this->cfg->options, 'atlasEnabled') and $this->cfg->options->atlasEnabled == 'True') // Legacy LWC < 3.4 (only one layer)
-            or
-            (property_exists($this->cfg, 'atlas') and property_exists($this->cfg->atlas, 'layers') and is_array($this->cfg->atlas->layers) and count($this->cfg->atlas->layers) > 0)) { // Multiple atlas
+            or (property_exists($this->cfg, 'atlas') and property_exists($this->cfg->atlas, 'layers') and is_array($this->cfg->atlas->layers) and count($this->cfg->atlas->layers) > 0)) { // Multiple atlas
             return true;
         }
 
@@ -737,9 +736,9 @@ class lizmapProject extends qgisProject
             $hasDisplayedLayer = !$onlyDisplayedLayers;
             foreach ($this->cfg->attributeLayers as $key => $obj) {
                 ++$count;
-                if ($onlyDisplayedLayers &&
-                    (!property_exists($obj, 'hideLayer') ||
-                     strtolower($obj->hideLayer) != 'true')
+                if ($onlyDisplayedLayers
+                    && (!property_exists($obj, 'hideLayer')
+                     || strtolower($obj->hideLayer) != 'true')
                 ) {
                     $hasDisplayedLayer = true;
                 }
@@ -954,6 +953,10 @@ class lizmapProject extends qgisProject
             return $filters;
         }
 
+        if (!is_array($layers)) {
+            return $filters;
+        }
+
         // for each layer get login filtered config and build expression
         foreach ($layers as $layername) {
             $lname = $layername;
@@ -972,9 +975,9 @@ class lizmapProject extends qgisProject
 
             // If login filter is configured for edition only and the expression
             // is not requested for edition, do not return expression
-            if (property_exists($loginFilteredConfig, 'edition_only') &&
-                $this->optionToBoolean($loginFilteredConfig->edition_only) &&
-                !$edition) {
+            if (property_exists($loginFilteredConfig, 'edition_only')
+                && $this->optionToBoolean($loginFilteredConfig->edition_only)
+                && !$edition) {
                 continue;
             }
 
@@ -988,8 +991,8 @@ class lizmapProject extends qgisProject
             if (jAuth::isConnected()) {
                 $user = jAuth::getUserSession();
                 $login = $user->login;
-                if (property_exists($loginFilteredConfig, 'filterPrivate') &&
-                    $this->optionToBoolean($loginFilteredConfig->filterPrivate)
+                if (property_exists($loginFilteredConfig, 'filterPrivate')
+                    && $this->optionToBoolean($loginFilteredConfig->filterPrivate)
                 ) {
                     $filter = "\"${attribute}\" IN ( '".$login."' , 'all' )";
                 } else {
@@ -1214,20 +1217,20 @@ class lizmapProject extends qgisProject
             (
                 property_exists($configOptions, 'googleStreets')
                 && $configOptions->googleStreets == 'True'
-            ) ||
-            (
+            )
+            || (
                 property_exists($configOptions, 'googleSatellite')
                 && $configOptions->googleSatellite == 'True'
-            ) ||
-            (
+            )
+            || (
                 property_exists($configOptions, 'googleHybrid')
                 && $configOptions->googleHybrid == 'True'
-            ) ||
-            (
+            )
+            || (
                 property_exists($configOptions, 'googleTerrain')
                 && $configOptions->googleTerrain == 'True'
-            ) ||
-            (
+            )
+            || (
                 property_exists($configOptions, 'externalSearch')
                 && $configOptions->externalSearch == 'google'
             )
@@ -1271,8 +1274,8 @@ class lizmapProject extends qgisProject
     {
         $printTemplates = array();
 
-        if (property_exists($cfg->options, 'print') &&
-            $cfg->options->print == 'True'
+        if (property_exists($cfg->options, 'print')
+            && $cfg->options->print == 'True'
         ) {
             // get restricted composers
             $rComposers = array();
@@ -1396,8 +1399,8 @@ class lizmapProject extends qgisProject
             }
             // get layout qgs project version >= 3
             $layouts = $qgsLoad->xpath('//Layout');
-            if ($layouts && count($layouts) > 0 &&
-                version_compare($services->qgisServerVersion, '3.0', '>=')) {
+            if ($layouts && count($layouts) > 0
+                && version_compare($services->qgisServerVersion, '3.0', '>=')) {
                 foreach ($layouts as $layout) {
                     // test restriction
                     if (in_array((string) $layout['name'], $rComposers)) {
@@ -1625,8 +1628,19 @@ class lizmapProject extends qgisProject
                 $spatialiteExt = $this->getSpatialiteExtension();
             }
             if (!$spatialiteExt) {
-                jLog::log('Spatialite is not available', 'error');
+                jLog::log('Spatialite is not available', 'notice');
                 foreach ($editionLayers as $key => $obj) {
+                    // Improve performance by getting provider directly from config
+                    // Available for lizmap plugin >= 3.3.2
+                    if (property_exists($obj, 'provider')) {
+                        if ($obj->provider == 'spatialite') {
+                            unset($editionLayers->{$key});
+                        }
+
+                        continue;
+                    }
+
+                    // Read layer property from QGIS project XML
                     $layerXml = $this->getXmlLayer2($xml, $obj->layerId);
                     if (count($layerXml) == 0) {
                         continue;
@@ -1655,6 +1669,13 @@ class lizmapProject extends qgisProject
 
             // Get field order & visibility
             foreach ($attributeLayers as $key => $obj) {
+                // Improve performance by getting custom_config status directly from config
+                // Available for lizmap plugin >= 3.3.3
+                if (property_exists($obj, 'custom_config') && $obj->custom_config != 'True') {
+                    continue;
+                }
+
+                // Read layer property from QGIS project XML
                 $layerXml = $this->getXmlLayer2($xml, $obj->layerId);
                 if (count($layerXml) == 0) {
                     continue;
@@ -1988,9 +2009,9 @@ class lizmapProject extends qgisProject
                 }
             }
             // atlas
-            if (property_exists($configJson->options, 'atlasEnabled') &&
-                $this->optionToBoolean($configJson->options->atlasEnabled) &&
-                $configJson->options->atlasLayer == $obj->id) {
+            if (property_exists($configJson->options, 'atlasEnabled')
+                && $this->optionToBoolean($configJson->options->atlasEnabled)
+                && $configJson->options->atlasLayer == $obj->id) {
                 $configJson->options->atlasLayer = '';
                 $configJson->options->atlasPrimaryKey = '';
                 $configJson->options->atlasFeatureLabel = '';
@@ -2027,9 +2048,9 @@ class lizmapProject extends qgisProject
             // printTemplates
             $printTemplatesToKeep = array();
             foreach ($configJson->printTemplates as $printTemplate) {
-                if (array_key_exists('atlas', $printTemplate) &&
-                    array_key_exists('coverageLayer', $printTemplate['atlas']) &&
-                    $printTemplate['atlas']['coverageLayer'] != $obj->id) {
+                if (array_key_exists('atlas', $printTemplate)
+                    && array_key_exists('coverageLayer', $printTemplate['atlas'])
+                    && $printTemplate['atlas']['coverageLayer'] != $obj->id) {
                     $printTemplatesToKeep[] = $printTemplate;
                 }
             }

@@ -137,10 +137,15 @@ class lizmapProxy
             'Accept' => '*/*',
         ), $options['headers']);
 
-        $options['headers'] = array_merge(
-            self::userHttpHeader(),
-            $options['headers']
-        );
+        if (strpos($url, $services->wmsServerURL) === 0) {
+            // headers only for QGIS server
+            $options['headers'] = array_merge(
+                self::userHttpHeader(),
+                $services->wmsServerHeaders,
+                $options['headers']
+            );
+        }
+
         if (isset($options['loginFilteredOverride'])) {
             $options['headers']['X-Lizmap-Override-Filter'] = $options['loginFilteredOverride'];
         }
@@ -458,8 +463,8 @@ class lizmapProxy
         $metatileBuffer = 5;
 
         // Also checks if gd is installed
-        if ($metatileSize && $useCache && $wmsClient == 'web' &&
-            extension_loaded('gd') && function_exists('gd_info')) {
+        if ($metatileSize && $useCache && $wmsClient == 'web'
+            && extension_loaded('gd') && function_exists('gd_info')) {
             // Metatile Size
             $metatileSizeExp = explode(',', $metatileSize);
             $metatileSizeX = (int) $metatileSizeExp[0];
@@ -510,8 +515,8 @@ class lizmapProxy
 
         // Metatile : if needed, crop the metatile into a single tile
         // Also checks if gd is installed
-        if ($metatileSize && $useCache && $wmsClient == 'web' &&
-            extension_loaded('gd') && function_exists('gd_info')
+        if ($metatileSize && $useCache && $wmsClient == 'web'
+            && extension_loaded('gd') && function_exists('gd_info')
         ) {
 
             // Save original content into an image var

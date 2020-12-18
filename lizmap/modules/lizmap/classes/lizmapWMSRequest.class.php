@@ -44,12 +44,22 @@ class lizmapWMSRequest extends lizmapOGCRequest
 
         // filter data by login
         $layers = $this->param('layers');
+
+        // 'getprintatlas' request has param 'layer' and not 'layers'
+        if ($this->param('request') == 'getprintatlas') {
+            $layers = $this->param('layer');
+        }
+
         if (is_string($layers)) {
             $layers = explode(',', $layers);
         }
 
         // get login filters
-        $loginFilters = $this->project->getLoginFilters($layers);
+        $loginFilters = array();
+
+        if ($layers) {
+            $loginFilters = $this->project->getLoginFilters($layers);
+        }
 
         // login filters array is empty
         if (empty($loginFilters)) {
@@ -317,9 +327,9 @@ class lizmapWMSRequest extends lizmapOGCRequest
         $qgisQueryLayers = array();
         foreach ($queryLayers as $queryLayer) {
             $configLayer = $this->project->findLayerByAnyName($queryLayer);
-            if (property_exists($configLayer, 'externalAccess') &&
-                $configLayer->externalAccess != 'False' &&
-                property_exists($configLayer->externalAccess, 'url')
+            if (property_exists($configLayer, 'externalAccess')
+                && $configLayer->externalAccess != 'False'
+                && property_exists($configLayer->externalAccess, 'url')
             ) {
                 $externalWMSConfigLayers[] = $configLayer;
             } else {
@@ -517,8 +527,8 @@ class lizmapWMSRequest extends lizmapOGCRequest
 
             if (!$returnPopup) {
                 $editionLayer = $this->project->findEditionLayerByLayerId($configLayer->id);
-                if ($editionLayer != null &&
-                    ($editionLayer->capabilities->modifyGeometry == 'True'
+                if ($editionLayer != null
+                    && ($editionLayer->capabilities->modifyGeometry == 'True'
                                      || $editionLayer->capabilities->modifyAttribute == 'True'
                                      || $editionLayer->capabilities->deleteFeature == 'True')
                 ) {
@@ -599,9 +609,9 @@ class lizmapWMSRequest extends lizmapOGCRequest
         foreach ($layer->Feature as $feature) {
             $id = (string) $feature['id'];
             // Optionnally filter by feature id
-            if ($filterFid &&
-                isset($filterFid[$configLayer->name]) &&
-                $filterFid[$configLayer->name] != $id
+            if ($filterFid
+                && isset($filterFid[$configLayer->name])
+                && $filterFid[$configLayer->name] != $id
             ) {
                 continue;
             }
