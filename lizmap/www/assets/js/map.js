@@ -434,7 +434,7 @@ var lizMap = function() {
       h -= (parseInt(mdmcv.css('padding-top')) ? parseInt(mdmcv.css('padding-top')) : 0 ) ;
       h -= (parseInt(mdmcv.css('padding-bottom')) ? parseInt(mdmcv.css('padding-bottom')) : 0 ) ;
 
-      mdmcv.css( 'max-height', h ).css('overflow-x', 'hidden').css('overflow-y', 'auto');
+      mdmcv.css( 'max-height', 'calc(100vh - 102px)' ).css('overflow-x', 'hidden').css('overflow-y', 'auto');
   }
 
   /**
