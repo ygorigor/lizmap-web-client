@@ -433,8 +433,11 @@ var lizMap = function() {
       h -= (parseInt(mdmcv.css('margin-bottom')) ? parseInt(mdmcv.css('margin-bottom')) : 0 ) ;
       h -= (parseInt(mdmcv.css('padding-top')) ? parseInt(mdmcv.css('padding-top')) : 0 ) ;
       h -= (parseInt(mdmcv.css('padding-bottom')) ? parseInt(mdmcv.css('padding-bottom')) : 0 ) ;
-
+      if (matchMedia('(pointer:coarse)').matches) {
+          mdmcv.css( 'max-height', 'calc(100vh - 230px)' ).css('overflow-x', 'hidden').css('overflow-y', 'auto');
+      }else{
       mdmcv.css( 'max-height', 'calc(100vh - 102px)' ).css('overflow-x', 'hidden').css('overflow-y', 'auto');
+      }
   }
 
   /**
