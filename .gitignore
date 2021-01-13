@@ -55,6 +55,7 @@ tests/qgis-server-plugins/*
 assets/node_modules/
 tests/js/node_modules/
 tests/.env
+.vscode/
 
 .stfolder
 /.stignore
