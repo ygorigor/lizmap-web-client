@@ -337,7 +337,7 @@ var lizAttributeTable = function() {
                 // Search input
                 html+= '<div class="btn-group">';
                 html+= '  <input id="attribute-layer-search-' + cleanName + '" type="search" class="form-control" placeholder="'+lizDict['attributeLayers.toolbar.input.search.title']+'">';
-                html+= '  <i class="clear-layer-search icon-remove" style="position:absolute;right:4px;top:4px;cursor:pointer;"></i>';
+                html+= '  <i class="clear-layer-search icon-remove" style="position:absolute;right:4px;top:7px;cursor:pointer;"></i>';
                 html+= '</div>';
 
                 // Selected searched lines button
