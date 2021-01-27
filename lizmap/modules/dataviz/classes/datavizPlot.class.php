@@ -887,8 +887,8 @@ class datavizPlotBar extends datavizPlot
                 ),
             ),
             'textinfo' => 'value',
-            'textposition' => 'auto',
-            'texttemplate' => '%{value}',
+            'textposition' => 'outside',
+            'texttemplate' => '%{value:.2f}',
             'textfont' => array(
                     'color' => 'white',
                     'size' => '14'
