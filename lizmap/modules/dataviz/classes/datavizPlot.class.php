@@ -886,13 +886,7 @@ class datavizPlotBar extends datavizPlot
                     'width' => null,
                 ),
             ),
-            'textinfo' => 'value',
-            'textposition' => 'outside',
-            'texttemplate' => '%{value:.2f}',
-            'textfont' => array(
-                    'color' => 'white',
-                    'size' => '14'
-                ),
+            'textinfo' => 'none',
             'orientation' => 'v',
         );
         if ($this->horizontal) {
