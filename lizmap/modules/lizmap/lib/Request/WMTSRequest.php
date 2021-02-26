@@ -98,7 +98,7 @@ class WMTSRequest extends OGCRequest
 
         foreach ($params as $var => $param) {
             ${$var} = $this->param($param);
-            if (!${$var}) {
+            if (${$var} === '' || ${$var} === null) {
                 \jMessage::add('The parameter '.$var.' is mandatory!', 'MissingParameter');
 
                 return $this->serviceException();
