@@ -1,10 +1,23 @@
 This test is to check the cache.
 - [ ] Config the tile cache as file cache
-- [ ] Create the the cache with the lizmap command line:
+- [ ] Create a subset of the cache with the lizmap command line:
   - `php lizmap/scripts/script.php lizmap~wmts:capabilities testsrepository test_cache`
   - `php lizmap/scripts/script.php lizmap~wmts:capabilities -v  testsrepository test_cache Quartiers EPSG:3857`
-  - `php lizmap/scripts/script.php lizmap~wmts:seeding -v -f testsrepository test_cache Quartiers EPSG:3857 0 18`
+  - `php lizmap/scripts/script.php lizmap~wmts:seeding -v -f testsrepository test_cache Quartiers EPSG:3857 10 10`
 - [ ] Check the tile cache size
+  - `du -sc /tmp/testsrepository/test_cache/Quartiers/EPSG_3857/lizmap_/`
+  - `find /tmp/testsrepository/test_cache/Quartiers/EPSG_3857/lizmap_/ -type f | wc -l`
+- [ ] Run the request `http://lizmap.local:8130/index.php/lizmap/service/?repository=testsrepository&project=test_cache&LAYERS=Quartiers&STYLES=défaut&VERSION=1.0.0&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&FORMAT=image%2Fpng&DPI=96&TRANSPARENT=true&SERVICE=WMTS&REQUEST=GetTile&LAYER=Quartiers&STYLE=default&TILEMATRIXSET=EPSG%3A3857&TILEMATRIX=10&TILEROW=373&TILECOL=523`
+- [ ] Check the tile cache size has not changed
+  - `du -sc /tmp/testsrepository/test_cache/Quartiers/EPSG_3857/lizmap_/`
+  - `find /tmp/testsrepository/test_cache/Quartiers/EPSG_3857/lizmap_/ -type f | wc -l`
+- [ ] Create the needed cache for the map with the lizmap command line:
+  - `php lizmap/scripts/script.php lizmap~wmts:capabilities testsrepository test_cache`
+  - `php lizmap/scripts/script.php lizmap~wmts:capabilities -v  testsrepository test_cache Quartiers EPSG:3857`
+  - `php lizmap/scripts/script.php lizmap~wmts:seeding -v -f testsrepository test_cache Quartiers EPSG:3857 10 15`
+- [ ] Check the tile cache size
+  - `du -sc /tmp/testsrepository/test_cache/Quartiers/EPSG_3857/lizmap_/`
+  - `find /tmp/testsrepository/test_cache/Quartiers/EPSG_3857/lizmap_/ -type f | wc -l`
 - [ ] Go to the map, zoom and pan on it without authentication
 - [ ] Check the tile cache size has not changed
 - [ ] Authenticate as admins
