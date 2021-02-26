@@ -14,6 +14,7 @@ Release on 2021-02-25
 - Fix error about script.php into the docker container
 - Hide label in legend for layers with single symbol rendering
 - Fix WMTS Request - use specific $wmsRequest parameters array
+- Fix Pre-generated cache is not used in Lizmap 3.4.1
 
 ## Version 3.4.1
 
