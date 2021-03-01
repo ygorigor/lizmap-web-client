@@ -11,8 +11,10 @@ Release on 2021-02-25
 - Fix the adding of the user into group
 - Fix visual blank line between the map and the right-dock
 - Fix can't launch children layers edition from parent form
-- Fix error about script.php into the docker container 
+- Fix error about script.php into the docker container
 - Hide label in legend for layers with single symbol rendering
+- Fix WMTS Request - use specific $wmsRequest parameters array
+- Fix Pre-generated cache is not used in Lizmap 3.4.1
 
 ## Version 3.4.1
 
